@@ -1,10 +1,13 @@
+import json
+import pathlib
 import httpx
 from backend.jobs.job_store import Job
 from backend.integrations.jira_client import (
     fetch_single_story,
-    fetch_media_as_base64,
+    fetch_attachment_as_base64,
     create_bug_ticket,
 )
+
 from backend.pipeline.module1.adf_parser import parse_adf
 from backend.pipeline.module1.screen_classifier import classify_screen_type
 from backend.pipeline.module1.uvri import compute_uvri
@@ -15,10 +18,22 @@ from backend.pipeline.module3.test_generator import generate_dual_mode_tests
 from backend.pipeline.module3.cypress_runner import execute_cypress
 
 
+RESULTS_DIR = pathlib.Path("backend/output/results")
+
+
 async def emit(job: Job, step: str, payload: dict = None):
     """Push a progress event to the job's stream."""
     job.current_step = step
     await job.event_queue.put({"step": step, "payload": payload or {}})
+
+
+def _persist_result(story_key: str, result: dict) -> None:
+    """Write the final result to disk for the evaluation pipeline."""
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    (RESULTS_DIR / f"{story_key}.json").write_text(
+        json.dumps(result, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
 
 async def process_one_story(job: Job, story_key: str, app_url: str = None):
@@ -29,28 +44,35 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         await emit(job, "fetching_ticket")
         story = await fetch_single_story(story_key)
 
+        # Skip tickets with no description — record the skip for the audit trail
         if story["description_adf"] is None:
+            skip_record = {
+                "story_key": story_key,
+                "story_summary": story.get("summary", ""),
+                "status_at_skip": story.get("status"),
+                "skipped": True,
+                "reason": "null description",
+            }
+            _persist_result(story_key, skip_record)
             job.status = "completed"
-            job.result = {"skipped": True, "reason": "null description"}
+            job.result = skip_record
             await emit(job, "done", job.result)
             return
 
         # ── 2. Parse the ADF tree ───────────────────────────────────
         await emit(job, "parsing_adf")
         parsed = parse_adf(story["description_adf"])
-        # parsed = {
-        #   "story_text": str,
-        #   "nav_path": str,
-        #   "explicit_ACs": List[str],
-        #   "media_uuids": List[str],
-        # }
 
-        # ── 3. Download embedded design images ──────────────────────
+        # ── 3. Download design images from the ticket's attachments ─
+        image_attachments = [
+            a for a in story["attachments"]
+            if a.get("mime_type", "").startswith("image/")
+        ]
         await emit(job, "downloading_design_images",
-                   {"count": len(parsed["media_uuids"])})
+                   {"count": len(image_attachments)})
         design_images_b64 = []
-        for uuid_ in parsed["media_uuids"]:
-            img = await fetch_media_as_base64(uuid_)
+        for attachment in image_attachments:
+            img = await fetch_attachment_as_base64(attachment["content_url"])
             design_images_b64.append(img)
 
         # ── 4. Module 1 — Screen classification ─────────────────────
@@ -67,8 +89,7 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         # ── 6. Module 1 — Implicit inference ────────────────────────
         await emit(job, "running_implicit_inference")
         implicit_ACs = await infer_implicit_elements(parsed, screen_type)
-        await emit(job, "inference_done",
-                   {"implicit_ACs": implicit_ACs})
+        await emit(job, "inference_done", {"implicit_ACs": implicit_ACs})
 
         enriched_ACs = parsed["explicit_ACs"] + implicit_ACs
 
@@ -82,30 +103,26 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         })
 
         # ── 8. Module 2 — Multi-pass validation ─────────────────────
-        await emit(job, "module2_started",
-                   {"total_passes": 5})
+        await emit(job, "module2_started", {"total_passes": 5})
         passes = await run_multipass_validation(
             enriched_ACs, design_images_b64, n=5
         )
         await emit(job, "module2_passes_complete")
 
         verified = compute_confidence_index(passes)
-        await emit(job, "module2_done",
-                   {"verified_discrepancies": verified})
+        await emit(job, "module2_done", {"verified_discrepancies": verified})
 
         # ── 9. Module 3 — Test generation ───────────────────────────
         await emit(job, "generating_tests")
         tests = await generate_dual_mode_tests(enriched_ACs, verified)
-        await emit(job, "tests_generated",
-                   {"test_count": len(tests)})
+        await emit(job, "tests_generated", {"test_count": len(tests)})
 
         # ── 10. Module 3 — Cypress execution ────────────────────────
         cypress_results = []
         if app_url:
             await emit(job, "running_cypress")
             cypress_results = await execute_cypress(tests, app_url)
-            await emit(job, "cypress_done",
-                       {"results": cypress_results})
+            await emit(job, "cypress_done", {"results": cypress_results})
 
         # ── 11. Module 3 — Bug ticket creation ──────────────────────
         bugs_created = []
@@ -137,6 +154,7 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             "cypress_results": cypress_results,
             "bugs_created": bugs_created,
         }
+        _persist_result(story_key, job.result)
         job.status = "completed"
         await emit(job, "done", job.result)
 

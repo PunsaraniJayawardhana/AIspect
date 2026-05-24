@@ -11,7 +11,9 @@ JIRA_PROJECT_KEY = os.getenv("JIRA_PROJECT_KEY")    # e.g. "EXC"
 
 # Anthropic
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
+MODULE1_MODEL = os.getenv("MODULE1_MODEL", "claude-sonnet-4-6")
+MODULE2_MODEL = os.getenv("MODULE2_MODEL", "claude-opus-4-7")
+MODULE3_MODEL = os.getenv("MODULE3_MODEL", "claude-sonnet-4-6")
 
 # Pipeline config
 MODULE2_PASSES = int(os.getenv("MODULE2_PASSES", "5"))

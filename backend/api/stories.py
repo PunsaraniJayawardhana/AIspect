@@ -96,3 +96,60 @@ async def debug_direct_fetch():
             "error_message": str(e),
             "traceback": traceback.format_exc(),
         }
+
+@router.get("/debug-adf/{story_key}")
+async def debug_adf(story_key: str):
+    """Show the raw ADF tree of a specific story for parser development."""
+    try:
+        auth_token = base64.b64encode(
+            f"{JIRA_EMAIL}:{JIRA_API_TOKEN}".encode()
+        ).decode()
+        headers = {
+            "Accept": "application/json",
+            "Authorization": f"Basic {auth_token}",
+        }
+        url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url, headers=headers)
+        
+        issue = response.json()
+        return {
+            "key": issue["key"],
+            "summary": issue["fields"]["summary"],
+            "description_adf": issue["fields"].get("description"),
+            "attachments": [
+                {"id": a["id"], "filename": a["filename"]}
+                for a in issue["fields"].get("attachment", [])
+            ],
+        }
+    except Exception as e:
+        import traceback
+        return {"error": str(e), "traceback": traceback.format_exc()}
+
+
+@router.get("/debug-claude")
+async def debug_claude():
+    """Verify the Anthropic API key works."""
+    try:
+        from backend.integrations.claude_client import call_claude_json
+        from backend.config.settings import MODULE1_MODEL
+
+        result = await call_claude_json(
+            model=MODULE1_MODEL,
+            system_prompt="You return only JSON arrays. No explanations.",
+            user_prompt='Return a JSON array containing exactly the string "AIspect is alive".',
+            max_tokens=100,
+            temperature=0.0,
+        )
+        return {
+            "model_used": MODULE1_MODEL,
+            "claude_response": result,
+            "status": "ok",
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "traceback": traceback.format_exc(),
+        }
