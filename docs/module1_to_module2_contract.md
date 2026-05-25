@@ -3,9 +3,21 @@
 This document defines the shape of data that Module 1 produces and Module 2 consumes.
 Both teams must update this file before changing field names or types.
 
-## Where to find real examples
-- `backend/output/module2_fixtures/EXC-1.json` — signup screen, 8 explicit ACs + 11 implicit = 19 enriched
-- `backend/output/module2_fixtures/EXC-7.json` — home screen, 92 explicit ACs + 22 implicit = 114 enriched
+## How to generate real examples
+
+Fixtures are not committed to git (they contain large base64 images). 
+Generate them locally:
+
+```powershell
+python -m backend.scripts.export_module2_fixture EXC-1
+python -m backend.scripts.export_module2_fixture EXC-7
+```
+
+This writes to `backend/output/module2_fixtures/{STORY_KEY}.json`.
+
+You need a configured `.env` with Jira credentials and the AIspect 
+backend running (the script re-fetches from Jira to populate story_text, 
+nav_path, and design images).
 
 ## Required fields
 
