@@ -11,8 +11,9 @@ from backend.pipeline.module1.uvri import compute_uvri
 from backend.pipeline.module1.inference import infer_implicit_elements
 from backend.pipeline.module2.multipass_validator import run_multipass_validation
 from backend.pipeline.module2.confidence_index import compute_confidence_index
-from backend.pipeline.module3.test_generator import generate_dual_mode_tests
-from backend.pipeline.module3.cypress_runner import execute_cypress
+from backend.pipeline.module3.cypress_runner import get_confirmed_faults, run_cypress_tests
+from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
+from backend.pipeline.module3.test_generator import run_test_generator
 
 
 async def emit(job: Job, step: str, payload: dict = None):
@@ -94,34 +95,49 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
                    {"verified_discrepancies": verified})
 
         # ── 9. Module 3 — Test generation ───────────────────────────
-        await emit(job, "generating_tests")
-        tests = await generate_dual_mode_tests(enriched_ACs, verified)
-        await emit(job, "tests_generated",
-                   {"test_count": len(tests)})
+        await emit(job, "module3_started")
+        tests = run_test_generator(
+            verified_discrepancies=verified,
+            explicit_acs=parsed["explicit_ACs"],
+            implicit_acs=implicit_ACs,
+            story_text=parsed["story_text"],
+            story_key=story_key,
+            app_url=app_url,
+            nav_path=parsed.get("nav_path", ""),
+        )
+        export_to_docx(tests, story_key, f"backend/scripts/fixtures/{story_key}_test_cases.docx")
+        export_to_markdown(tests, story_key, f"backend/scripts/fixtures/{story_key}_test_cases.md")
+        await emit(job, "tests_generated", {"test_count": len(tests)})
 
         # ── 10. Module 3 — Cypress execution ────────────────────────
         cypress_results = []
+        bugs_created = []
         if app_url:
             await emit(job, "running_cypress")
-            cypress_results = await execute_cypress(tests, app_url)
-            await emit(job, "cypress_done",
-                       {"results": cypress_results})
+            cypress_results = run_cypress_tests(tests)
+            await emit(job, "cypress_done", {"results": cypress_results})
 
-        # ── 11. Module 3 — Bug ticket creation ──────────────────────
-        bugs_created = []
-        for result in cypress_results:
-            if result.get("mode") == "defect" and result.get("passed") is False:
-                await emit(job, "creating_bug_ticket",
-                           {"discrepancy": result["discrepancy"]["element"]})
+            for result in get_confirmed_faults(cypress_results):
+                await emit(job, "creating_bug_ticket", {"discrepancy": result.get("discrepancy_id")})
                 bug = await create_bug_ticket(
-                    summary=f"[AIspect] {result['discrepancy']['element']}",
-                    description=result["discrepancy"]["description"],
+                    summary=f"[AIspect] {result.get('scenario', result.get('discrepancy_id'))}",
+                    description=(
+                        f"{result.get('expected_result', '')} | "
+                        f"{result.get('scenario', '')}"
+                    ).strip(" |"),
                     parent_story_key=story_key,
-                    severity=result["discrepancy"]["severity"],
+                    severity=result.get("priority", "Medium"),
                 )
-                bugs_created.append(bug["key"])
+                bugs_created.append(
+                    {
+                        "ticket_key": bug["key"],
+                        "discrepancy_id": result.get("discrepancy_id"),
+                    }
+                )
 
-        # ── 12. Final result ────────────────────────────────────────
+        await emit(job, "module3_done", {"bugs_created": len(bugs_created)})
+
+        # ── 11. Final result ────────────────────────────────────────
         job.result = {
             "story_key": story_key,
             "screen_type": screen_type,
