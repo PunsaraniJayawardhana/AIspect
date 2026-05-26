@@ -1,0 +1,8 @@
+{
+  "story_key": "PROJ-42",
+  "total_runs": 5,
+  "summary": "Story: PROJ-42 | Total runs: 5 | HIGH (\u2192Module 3): 0 | MEDIUM (\u2192Review): 0 | LOW (Discarded): 0",
+  "passed_to_module3": [],
+  "needs_human_review": [],
+  "discarded": []
+}

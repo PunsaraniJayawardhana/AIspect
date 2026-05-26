@@ -12,8 +12,8 @@ with the explicit AC list before being passed to Module 2.
 """
 
 from typing import List, Dict, Any
-from backend.integrations.claude_client import call_claude_json
-from backend.config.settings import MODULE1_MODEL
+from integrations.claude_client import call_claude_json
+from config.settings import MODULE1_MODEL
 
 
 SYSTEM_PROMPT = """You are a senior Quality Assurance engineer with 10+ years of experience auditing web and mobile UI designs against requirements.

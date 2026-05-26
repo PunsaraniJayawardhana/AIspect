@@ -9,7 +9,7 @@ import json
 import re
 from typing import Any, List, Dict
 from anthropic import AsyncAnthropic, APIError, RateLimitError
-from backend.config.settings import ANTHROPIC_API_KEY
+from config.settings import ANTHROPIC_API_KEY
 
 
 # Single shared async client instance
