@@ -67,8 +67,8 @@ def export_fixture(story_key: str) -> pathlib.Path:
 def _load_story_text(story_key: str) -> str:
     """Load story_text by re-fetching from Jira and parsing the ADF."""
     import asyncio
-    from backend.integrations.jira_client import fetch_single_story
-    from backend.pipeline.module1.adf_parser import parse_adf
+    fromintegrations.jira_client import fetch_single_story
+    frompipeline.module1.adf_parser import parse_adf
 
     story = asyncio.run(fetch_single_story(story_key))
     parsed = parse_adf(story["description_adf"])
@@ -78,8 +78,8 @@ def _load_story_text(story_key: str) -> str:
 def _load_nav_path(story_key: str) -> str:
     """Load nav_path the same way as story_text."""
     import asyncio
-    from backend.integrations.jira_client import fetch_single_story
-    from backend.pipeline.module1.adf_parser import parse_adf
+    fromintegrations.jira_client import fetch_single_story
+    frompipeline.module1.adf_parser import parse_adf
 
     story = asyncio.run(fetch_single_story(story_key))
     parsed = parse_adf(story["description_adf"])
@@ -89,7 +89,7 @@ def _load_nav_path(story_key: str) -> str:
 def _load_design_images(story_key: str) -> list:
     """Re-fetch design images for the fixture."""
     import asyncio
-    from backend.integrations.jira_client import (
+    fromintegrations.jira_client import (
         fetch_single_story,
         fetch_attachment_as_base64,
     )
