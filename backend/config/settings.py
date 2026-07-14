@@ -12,7 +12,9 @@ JIRA_PROJECT_KEY = os.getenv("JIRA_PROJECT_KEY")    # e.g. "EXC"
 # LLM providers
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic").lower()
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5")
+MODULE1_MODEL = os.getenv("MODULE1_MODEL", "claude-sonnet-4-6")
+MODULE2_MODEL = os.getenv("MODULE2_MODEL", "claude-opus-4-7")
+MODULE3_MODEL = os.getenv("MODULE3_MODEL", "claude-sonnet-4-6")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 

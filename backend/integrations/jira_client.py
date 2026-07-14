@@ -1,7 +1,7 @@
 import httpx
 import base64
 from typing import List
-from backend.config.settings import (
+from config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
 )
 
@@ -28,6 +28,25 @@ async def fetch_story_keys() -> List[str]:
         return [issue["key"] for issue in response.json().get("issues", [])]
 
 
+# async def fetch_single_story(story_key: str) -> dict:
+#     """Fetch ONE story's full content by key. Preserves the raw ADF tree."""
+#     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
+#     params = {"fields": "summary,description,priority,status,attachment"}
+
+#     async with httpx.AsyncClient(timeout=30.0) as client:
+#         response = await client.get(url, headers=_HEADERS, params=params)
+#         response.raise_for_status()
+#         issue = response.json()
+
+#     return {
+#         "id": issue["key"],
+#         "summary": issue["fields"]["summary"],
+#         "description_adf": issue["fields"].get("description"),
+#         "priority": (issue["fields"].get("priority") or {}).get("name"),
+#         "status": (issue["fields"].get("status") or {}).get("name"),
+#         "attachments": issue["fields"].get("attachment", []),
+#     }
+
 async def fetch_single_story(story_key: str) -> dict:
     """Fetch ONE story's full content by key. Preserves the raw ADF tree."""
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
@@ -38,24 +57,43 @@ async def fetch_single_story(story_key: str) -> dict:
         response.raise_for_status()
         issue = response.json()
 
+    # Normalise attachments to a simple structure with everything we need.
+    attachments = []
+    for att in issue["fields"].get("attachment", []) or []:
+        attachments.append({
+            "id": att.get("id"),
+            "filename": att.get("filename"),
+            "mime_type": att.get("mimeType", ""),
+            "content_url": att.get("content"),  # ready-to-fetch URL
+            "size": att.get("size"),
+        })
+
     return {
         "id": issue["key"],
         "summary": issue["fields"]["summary"],
         "description_adf": issue["fields"].get("description"),
         "priority": (issue["fields"].get("priority") or {}).get("name"),
         "status": (issue["fields"].get("status") or {}).get("name"),
-        "attachments": issue["fields"].get("attachment", []),
+        "attachments": attachments,
     }
 
+# async def fetch_media_as_base64(media_uuid: str) -> str:
+#     """Download a Figma design image embedded as a media node."""
+#     url = f"{JIRA_BASE_URL}/rest/api/3/attachment/content/{media_uuid}"
+#     async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+#         response = await client.get(url, headers=_HEADERS)
+#         response.raise_for_status()
+#         return base64.b64encode(response.content).decode()
 
-async def fetch_media_as_base64(media_uuid: str) -> str:
-    """Download a Figma design image embedded as a media node."""
-    url = f"{JIRA_BASE_URL}/rest/api/3/attachment/content/{media_uuid}"
+async def fetch_attachment_as_base64(content_url: str) -> str:
+    """
+    Download a Jira attachment from its content URL and return base64 bytes.
+    The content URL comes directly from the ticket's attachments array.
+    """
     async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-        response = await client.get(url, headers=_HEADERS)
+        response = await client.get(content_url, headers=_HEADERS)
         response.raise_for_status()
         return base64.b64encode(response.content).decode()
-
 
 async def create_bug_ticket(
     summary: str,
