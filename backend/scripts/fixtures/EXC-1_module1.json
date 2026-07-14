@@ -1,0 +1,18 @@
+{
+  "story_key": "EXC-1",
+  "story_text": "As a registered user, I want to sign in securely so I can access my account.",
+  "nav_path": "Home > Login",
+  "screen_type": "login",
+  "explicit_ACs": [
+    {"ac_id": "AC-01", "text": "The login page shall display an email input field", "type": "explicit"},
+    {"ac_id": "AC-02", "text": "The login page shall display a password input field", "type": "explicit"},
+    {"ac_id": "AC-03", "text": "The login page shall allow a user to submit the form", "type": "explicit"},
+    {"ac_id": "AC-04", "text": "The login page shall show a validation message when credentials are invalid", "type": "explicit"},
+    {"ac_id": "AC-05", "text": "The login page shall support the forgot password flow", "type": "explicit"}
+  ],
+  "implicit_ACs": [
+    {"ac_id": "AC-06", "text": "The login page shall include a password show/hide toggle", "type": "implicit", "inference_rationale": "Password entry controls are expected on login screens"},
+    {"ac_id": "AC-07", "text": "The login page shall include a remember me checkbox", "type": "implicit", "inference_rationale": "Login flows commonly include persistent sign-in controls"}
+  ],
+  "uvri_score": 0.78
+}

@@ -70,31 +70,30 @@ module1_output = {
 
 
 # ── Run Module 2 ──────────────────────────────────────────────
-result = run_module2(
-    module1_output=module1_output,
-    N=5
-)
+
+# ── Print Results ─────────────────────────────────────────────
+result = run_module2(module1_output=module1_output)
 
 
 # ── Print Results ─────────────────────────────────────────────
 print("\n\nPASSED TO MODULE 3 (HIGH confidence):")
-print(json.dumps(result.passed_to_module3, indent=2))
+print(json.dumps(result.get("high_confidence", []), indent=2))
 
 print("\n\nNEEDS HUMAN REVIEW (MEDIUM confidence):")
-print(json.dumps(result.needs_human_review, indent=2))
+print(json.dumps(result.get("medium_confidence", []), indent=2))
 
 print("\n\nDISCARDED (likely hallucinations):")
-print(json.dumps(result.discarded, indent=2))
+print(json.dumps(result.get("low_confidence", []), indent=2))
 
 
 # ── Save Output JSON ──────────────────────────────────────────
 output_data = {
-    "story_key": module1_output["story_key"],
-    "total_runs": result.total_runs,
-    "summary": result.summary(),
-    "passed_to_module3": result.passed_to_module3,
-    "needs_human_review": result.needs_human_review,
-    "discarded": result.discarded
+    "story_key": module1_output.get("story_key") or module1_output.get("ticket_id"),
+    "total_runs": result.get("summary", {}).get("n_passes", os.environ.get("MODULE2_PASSES", 5)),
+    "summary": result.get("summary", {}),
+    "passed_to_module3": result.get("high_confidence", []),
+    "needs_human_review": result.get("medium_confidence", []),
+    "discarded": result.get("low_confidence", []),
 }
 
 with open("module2_output.json", "w") as f:

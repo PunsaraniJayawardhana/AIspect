@@ -1,0 +1,18 @@
+{
+  "story_key": "EXC-3",
+  "story_text": "As an authenticated user, I want to update my dashboard settings so I can customize the workspace.",
+  "nav_path": "Dashboard > Settings",
+  "screen_type": "generic_form",
+  "explicit_ACs": [
+    {"ac_id": "AC-01", "text": "The settings page shall show the current notification preference", "type": "explicit"},
+    {"ac_id": "AC-02", "text": "The settings page shall allow a user to change notification preferences", "type": "explicit"},
+    {"ac_id": "AC-03", "text": "The settings page shall save changes on submit", "type": "explicit"},
+    {"ac_id": "AC-04", "text": "The settings page shall show a success message after saving", "type": "explicit"}
+  ],
+  "implicit_ACs": [
+    {"ac_id": "AC-05", "text": "The settings page shall include a cancel action", "type": "implicit", "inference_rationale": "Forms typically include a cancel option"},
+    {"ac_id": "AC-06", "text": "The settings page shall preserve unsaved changes when navigating away", "type": "implicit", "inference_rationale": "Unsaved form state should be protected"},
+    {"ac_id": "AC-07", "text": "The settings page shall highlight unsaved fields", "type": "implicit", "inference_rationale": "Users need visual feedback before leaving a form"}
+  ],
+  "uvri_score": 0.74
+}

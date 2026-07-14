@@ -1,0 +1,18 @@
+{
+  "story_key": "EXC-2",
+  "story_text": "As a new user, I want to create an account so I can use the product.",
+  "nav_path": "Home > Sign Up",
+  "screen_type": "signup",
+  "explicit_ACs": [
+    {"ac_id": "AC-01", "text": "The sign up page shall collect a first name", "type": "explicit"},
+    {"ac_id": "AC-02", "text": "The sign up page shall collect a last name", "type": "explicit"},
+    {"ac_id": "AC-03", "text": "The sign up page shall collect an email address", "type": "explicit"},
+    {"ac_id": "AC-04", "text": "The sign up page shall collect a password", "type": "explicit"},
+    {"ac_id": "AC-05", "text": "The sign up page shall display a submit button", "type": "explicit"}
+  ],
+  "implicit_ACs": [
+    {"ac_id": "AC-06", "text": "The sign up page shall show password requirements", "type": "implicit", "inference_rationale": "Password creation flows typically describe strength requirements"},
+    {"ac_id": "AC-07", "text": "The sign up page shall present a terms and conditions link", "type": "implicit", "inference_rationale": "Registration flows commonly require legal acceptance"}
+  ],
+  "uvri_score": 0.81
+}

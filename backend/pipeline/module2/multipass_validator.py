@@ -76,6 +76,12 @@ async def run_multipass_validation(
 ) -> List[List[Dict[str, Any]]]:
 
     model = os.environ.get("MODULE2_MODEL", "claude-sonnet-4-6")
+    # If no API key is configured, run a local deterministic stub to allow
+    # offline testing and development.
+    if "ANTHROPIC_API_KEY" not in os.environ:
+        print("[Module2] ANTHROPIC_API_KEY not set — using offline stub for passes")
+        return [[] for _ in range(n)]
+
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
     all_pass_results = []

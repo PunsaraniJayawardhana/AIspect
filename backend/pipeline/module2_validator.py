@@ -2,6 +2,7 @@
 
 import os
 import json
+import asyncio
 from typing import Dict, Any, List
 
 from pipeline.module2.multipass_validator import run_multipass_validation
@@ -23,9 +24,21 @@ def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:
         - medium_confidence: list for human review
         - summary: counts per level
     """
-    ticket_id = module1_output.get("ticket_id", "UNKNOWN")
-    criteria = module1_output.get("enriched_acceptance_criteria", [])
-    design_images = module1_output.get("design_images", [])
+    # Accept multiple possible keys for compatibility with Module 1 outputs
+    ticket_id = module1_output.get("ticket_id") or module1_output.get("story_key") or "UNKNOWN"
+    criteria = (
+        module1_output.get("enriched_acceptance_criteria")
+        or module1_output.get("enriched_ACs")
+        or module1_output.get("enriched_acceptance_criteria_list")
+        or []
+    )
+    # Images may be named `design_images` or `design_images_b64`
+    design_images = (
+        module1_output.get("design_images")
+        or module1_output.get("design_images_b64")
+        or module1_output.get("design_images_base64")
+        or []
+    )
     
     # Read config from environment
     n_passes = int(os.environ.get("MODULE2_PASSES", 5))
@@ -41,8 +54,8 @@ def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:
     if not design_images:
         raise ValueError(f"[Module2] No design images received for ticket {ticket_id}")
     
-    # Step 1: Run N validation passes
-    all_pass_results = run_multipass_validation(criteria, design_images, n_passes, model)
+    # Step 1: Run N validation passes (multipass validator is async)
+    all_pass_results = asyncio.run(run_multipass_validation(criteria, design_images, n_passes))
     
     # Step 2: Compute confidence index and classify
     all_discrepancies = compute_confidence_index(

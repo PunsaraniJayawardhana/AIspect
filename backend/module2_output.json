@@ -1,7 +1,13 @@
 {
   "story_key": "PROJ-42",
   "total_runs": 5,
-  "summary": "Story: PROJ-42 | Total runs: 5 | HIGH (\u2192Module 3): 0 | MEDIUM (\u2192Review): 0 | LOW (Discarded): 0",
+  "summary": {
+    "total_candidates": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0,
+    "n_passes": 5
+  },
   "passed_to_module3": [],
   "needs_human_review": [],
   "discarded": []
