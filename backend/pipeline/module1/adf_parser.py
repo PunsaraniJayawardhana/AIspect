@@ -109,6 +109,15 @@ def _extract_nav_path(doc_content: List[Dict[str, Any]]) -> str:
             return path
     return ""
 
+def _extract_context(doc_content: List[Dict[str, Any]]) -> str:
+    """Pull the descriptive context/background from the 'Context' section."""
+    nodes = _find_section_content(doc_content, "Context")
+    parts: List[str] = []
+    for node in nodes:
+        text = _paragraph_text(node)
+        if text:
+            parts.append(text)
+    return " ".join(parts).strip()
 
 def _flatten_ac_list(
     list_node: Dict[str, Any],
@@ -252,18 +261,10 @@ def _extract_media_uuids(doc_content: List[Dict[str, Any]]) -> List[str]:
 # ── Public entry point ─────────────────────────────────────────────────
 
 def parse_adf(description_adf: Optional[Dict[str, Any]]) -> Dict[str, Any]:
-    """
-    Parse a Jira ticket's ADF description tree into Module 1's working format.
-
-    Returns:
-        story_text   : str
-        nav_path     : str
-        explicit_ACs : List[str]
-        media_uuids  : List[str]
-    """
     if not description_adf or not isinstance(description_adf, dict):
         return {
             "story_text": "",
+            "context": "",
             "nav_path": "",
             "explicit_ACs": [],
             "media_uuids": [],
@@ -273,6 +274,7 @@ def parse_adf(description_adf: Optional[Dict[str, Any]]) -> Dict[str, Any]:
 
     return {
         "story_text": _extract_story_text(doc_content),
+        "context": _extract_context(doc_content),
         "nav_path": _extract_nav_path(doc_content),
         "explicit_ACs": _extract_acs(doc_content),
         "media_uuids": _extract_media_uuids(doc_content),
