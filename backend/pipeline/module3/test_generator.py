@@ -4,6 +4,7 @@ import logging
 from backend.pipeline.module3.fixture_loader import get_module1_inputs, get_module2_inputs
 from backend.pipeline.module3.llm_client import call_llm
 from backend.pipeline.module3.tpri import prioritize_discrepancies
+from backend.pipeline.module3.input_schema import normalize_acs, adapt_discrepancies
 
 logger = logging.getLogger(__name__)
 
@@ -266,15 +267,24 @@ def run_test_generator(
     )
     verified_discrepancies = get_module2_inputs(story_key, verified_discrepancies)
 
-    normalized_explicit = _normalize_acs(explicit_acs)
-    normalized_implicit = _normalize_acs(implicit_acs)
+    normalized_explicit = normalize_acs(explicit_acs, default_type="explicit", start_index=1)
+    normalized_implicit = normalize_acs(
+        implicit_acs, default_type="implicit", start_index=len(normalized_explicit) + 1
+    )
     all_acs = normalized_explicit + normalized_implicit
+    
+    adapted_discrepancies = adapt_discrepancies(verified_discrepancies, all_acs)
 
     prioritized = prioritize_discrepancies(
-        verified_discrepancies,
+        adapted_discrepancies,
         all_acs,
         story_text or "Unknown user story",
     )
+
+    for item in adapted_discrepancies:
+        print(f"[Module3 DEBUG] requirement_id={item.get('requirement_id')} "
+              f"ac_match_score={item.get('ac_match_score')} "
+              f"ac_text={item.get('ac_text')[:60]}")
 
     defect_tests = generate_defect_tests(prioritized, app_url, story_key) if app_url else []
     coverage_tests = generate_coverage_tests(all_acs, story_text or "Unknown user story", story_key)

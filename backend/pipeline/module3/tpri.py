@@ -8,11 +8,11 @@ from backend.pipeline.module3.llm_client import call_llm
 logger = logging.getLogger(__name__)
 
 SEVERITY_LOOKUP = {
-    "Missing_Element": 1.0,
-    "Business_Rule_Violation": 0.9,
-    "Interaction_Flow_Error": 0.7,
-    "Wrong_Label": 0.6,
-    "Layout_Constraint_Mismatch": 0.4,
+    "Missing Element": 1.0,
+    "Business Rule Violation": 0.9,
+    "Interaction Flow Error": 0.7,
+    "Wrong Label": 0.6,
+    "Layout Constraint Mismatch": 0.4,
 }
 
 
