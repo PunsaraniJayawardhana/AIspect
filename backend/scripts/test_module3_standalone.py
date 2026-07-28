@@ -57,14 +57,14 @@ def main():
 
     reset_usage_log()
 
-    explicit_acs, implicit_acs, story_text, nav_path = get_module1_inputs(
-        args.story_key,
-        [],
-        [],
-        "",
-        "",
-    )
-    verified_discrepancies = get_module2_inputs(args.story_key, [])
+    with open(f"output/results/{args.story_key}.json", "r", encoding="utf-8") as f:
+        real_result = json.load(f)
+
+    explicit_acs = real_result.get("explicit_ACs", [])
+    implicit_acs = real_result.get("implicit_ACs", [])
+    story_text = ""  # not persisted in output/results/, keeping empty is fine for test generation
+    nav_path = ""
+    verified_discrepancies = real_result.get("all_discrepancies", [])
 
     tests = run_test_generator(
         verified_discrepancies,

@@ -1,21 +1,23 @@
 import json
 import pathlib
 import httpx
-from jobs.job_store import Job
-from integrations.jira_client import (
+import logging
+import inspect
+from backend.jobs.job_store import Job
+from backend.integrations.jira_client import (
     fetch_single_story,
     fetch_attachment_as_base64,
     create_bug_ticket,
 )
 
-from pipeline.module1.adf_parser import parse_adf
-from pipeline.module1.screen_classifier import classify_screen_type
-from pipeline.module1.uvri import compute_uvri
-from pipeline.module1.inference import infer_implicit_elements
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
-from pipeline.module3.test_generator import generate_dual_mode_tests
-from pipeline.module3.cypress_runner import execute_cypress
+from backend.pipeline.module1.adf_parser import parse_adf
+from backend.pipeline.module1.screen_classifier import classify_screen_type
+from backend.pipeline.module1.uvri import compute_uvri
+from backend.pipeline.module1.inference import infer_implicit_elements
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
+from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
 
 
 RESULTS_DIR = pathlib.Path("output/results")
@@ -160,7 +162,23 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         # ── 9. Module 3 — Test generation ───────────────────────────
         # Only HIGH confidence discrepancies are passed to Module 3
         await emit(job, "generating_tests")
-        tests = await generate_dual_mode_tests(enriched_ACs, high_confidence)
+        # Debug: log the callable and its signature to diagnose invocation issues
+        logging.getLogger(__name__).info("generate_dual_mode_tests object: %r", generate_dual_mode_tests)
+        try:
+            sig = inspect.signature(generate_dual_mode_tests)
+        except Exception:
+            sig = None
+        logging.getLogger(__name__).info("generate_dual_mode_tests signature: %s", sig)
+
+        tests = generate_dual_mode_tests(
+            verified,
+            parsed["explicit_ACs"],
+            implicit_ACs,
+            parsed.get("story_text", ""),
+            story_key,
+            app_url,
+            parsed.get("nav_path", ""),
+        )
         await emit(job, "tests_generated", {"test_count": len(tests)})
 
         # ── 10. Module 3 — Cypress execution ────────────────────────

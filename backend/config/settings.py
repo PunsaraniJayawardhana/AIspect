@@ -15,6 +15,8 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 MODULE1_MODEL = os.getenv("MODULE1_MODEL", "claude-sonnet-4-6")
 MODULE2_MODEL = os.getenv("MODULE2_MODEL", "claude-opus-4-7")
 MODULE3_MODEL = os.getenv("MODULE3_MODEL", "claude-sonnet-4-6")
+# Backwards-compatible alias for older config keys
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL") or MODULE1_MODEL
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
