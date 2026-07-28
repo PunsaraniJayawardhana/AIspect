@@ -1,10 +1,14 @@
 import httpx
 import base64
-from typing import List
+import os
+import json
 import logging
+from typing import List, Optional
 from backend.config.settings import (
-    JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
+    JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
+
+logger = logging.getLogger(__name__)
 
 _AUTH_TOKEN = base64.b64encode(
     f"{JIRA_EMAIL}:{JIRA_API_TOKEN}".encode()
@@ -15,11 +19,15 @@ _HEADERS = {
 }
 
 
-async def fetch_story_keys() -> List[str]:
-    """Return only the story keys for the configured project."""
+async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
+    """Return story keys for the given project (falls back to the .env default)."""
+    key = project_key or DEFAULT_JIRA_PROJECT_KEY
+    if not key:
+        raise ValueError("project_key was not provided and no default is configured")
+
     url = f"{JIRA_BASE_URL}/rest/api/3/search/jql"
     params = {
-        "jql": f"project={JIRA_PROJECT_KEY} AND issuetype=Story ORDER BY created ASC",
+        "jql": f"project={key} AND issuetype=Story ORDER BY created ASC",
         "fields": "summary",
         "maxResults": 100,
     }
@@ -29,58 +37,33 @@ async def fetch_story_keys() -> List[str]:
         return [issue["key"] for issue in response.json().get("issues", [])]
 
 
-# async def fetch_single_story(story_key: str) -> dict:
-#     """Fetch ONE story's full content by key. Preserves the raw ADF tree."""
-#     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
-#     params = {"fields": "summary,description,priority,status,attachment"}
+async def fetch_single_story(story_key: str, use_fixture: bool = False) -> dict:
+    """Fetch ONE story's full content by key. Works for any project — the
+    key itself (e.g. 'EXC-1', 'PROJ-42') already identifies the project.
 
-#     async with httpx.AsyncClient(timeout=30.0) as client:
-#         response = await client.get(url, headers=_HEADERS, params=params)
-#         response.raise_for_status()
-#         issue = response.json()
-
-#     return {
-#         "id": issue["key"],
-#         "summary": issue["fields"]["summary"],
-#         "description_adf": issue["fields"].get("description"),
-#         "priority": (issue["fields"].get("priority") or {}).get("name"),
-#         "status": (issue["fields"].get("status") or {}).get("name"),
-#         "attachments": issue["fields"].get("attachment", []),
-#     }
-
-async def fetch_single_story(story_key: str) -> dict:
-    """Fetch ONE story's full content by key. Preserves the raw ADF tree.
-
-    If Jira environment variables are not configured, attempt to load a
-    local fixture from `backend/scripts/fixtures/{story_key}_module1.json`
-    and construct a minimal ADF-compatible payload so the orchestrator can
-    run end-to-end using fixtures.
+    If use_fixture=True, load a local fixture from
+    `backend/scripts/fixtures/{story_key}_module1.json` instead of calling
+    Jira. This is an explicit opt-in only — never triggered automatically.
     """
-    # Prefer local fixtures when available so offline runs work even if
-    # Jira env vars are partially configured. This makes testing reliable.
-    import os, json
-    logger = logging.getLogger(__name__)
-    fixture_dir = os.path.join(os.path.dirname(__file__), "..", "scripts", "fixtures")
-    fixture_path = os.path.join(fixture_dir, f"{story_key}_module1.json")
-    if os.path.exists(fixture_path):
+    if use_fixture:
+        fixture_dir = os.path.join(os.path.dirname(__file__), "..", "scripts", "fixtures")
+        fixture_path = os.path.join(fixture_dir, f"{story_key}_module1.json")
+        if not os.path.exists(fixture_path):
+            raise FileNotFoundError(f"Fixture requested but not found: {fixture_path}")
+
         logger.info("Using local fixture for story %s: %s", story_key, fixture_path)
         with open(fixture_path, "r", encoding="utf-8") as fh:
             data = json.load(fh)
 
-        # Build a minimal ADF-like tree to satisfy parse_adf()
         story_text = data.get("story_text", "")
         explicit_acs = data.get("explicit_ACs", [])
 
         content = []
-        # User story
         content.append({"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "User story"}]})
         content.append({"type": "paragraph", "content": [{"type": "text", "text": story_text}]})
-
-        # Acceptance criteria
         content.append({"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "Acceptance criteria"}]})
         bullets = {"type": "bulletList", "content": []}
         for ac in explicit_acs:
-            # ac may be dict or string
             ac_text = ac.get("text") if isinstance(ac, dict) else str(ac)
             bullets["content"].append({
                 "type": "listItem",
@@ -90,14 +73,13 @@ async def fetch_single_story(story_key: str) -> dict:
 
         return {
             "id": story_key,
-            "summary": data.get("story_text", ""),
+            "summary": story_text,
             "description_adf": {"type": "doc", "content": content},
             "priority": None,
             "status": None,
             "attachments": [],
         }
 
-    # Fallback to live Jira call
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
     params = {"fields": "summary,description,priority,status,attachment"}
 
@@ -107,14 +89,13 @@ async def fetch_single_story(story_key: str) -> dict:
         response.raise_for_status()
         issue = response.json()
 
-    # Normalise attachments to a simple structure with everything we need.
     attachments = []
     for att in issue["fields"].get("attachment", []) or []:
         attachments.append({
             "id": att.get("id"),
             "filename": att.get("filename"),
             "mime_type": att.get("mimeType", ""),
-            "content_url": att.get("content"),  # ready-to-fetch URL
+            "content_url": att.get("content"),
             "size": att.get("size"),
         })
 
@@ -127,23 +108,19 @@ async def fetch_single_story(story_key: str) -> dict:
         "attachments": attachments,
     }
 
-# async def fetch_media_as_base64(media_uuid: str) -> str:
-#     """Download a Figma design image embedded as a media node."""
-#     url = f"{JIRA_BASE_URL}/rest/api/3/attachment/content/{media_uuid}"
-#     async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-#         response = await client.get(url, headers=_HEADERS)
-#         response.raise_for_status()
-#         return base64.b64encode(response.content).decode()
 
 async def fetch_attachment_as_base64(content_url: str) -> str:
-    """
-    Download a Jira attachment from its content URL and return base64 bytes.
-    The content URL comes directly from the ticket's attachments array.
-    """
+    """Download a Jira attachment from its content URL and return base64 bytes."""
     async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
         response = await client.get(content_url, headers=_HEADERS)
         response.raise_for_status()
         return base64.b64encode(response.content).decode()
+
+
+def _project_key_from_story_key(story_key: str) -> str:
+    """Derive the project key from a story key like 'EXC-1' -> 'EXC'."""
+    return story_key.split("-")[0]
+
 
 async def create_bug_ticket(
     summary: str,
@@ -151,11 +128,17 @@ async def create_bug_ticket(
     parent_story_key: str,
     severity: str,
 ) -> dict:
-    """Create a Jira bug ticket linked to the originating user story."""
+    """
+    Create a Jira bug ticket in the SAME project as the originating story,
+    so bugs for a story in any project land in that project, never in
+    whatever DEFAULT_JIRA_PROJECT_KEY happens to be set to.
+    """
+    project_key = _project_key_from_story_key(parent_story_key)
+
     url = f"{JIRA_BASE_URL}/rest/api/3/issue"
     payload = {
         "fields": {
-            "project": {"key": JIRA_PROJECT_KEY},
+            "project": {"key": project_key},
             "summary": summary,
             "issuetype": {"name": "Bug"},
             "description": {
