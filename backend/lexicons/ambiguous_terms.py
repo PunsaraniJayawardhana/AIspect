@@ -31,16 +31,18 @@ WEAK_MODALS: List[str] = [
 
 # ── Category 2: Vague adjectives / adverbs (Femmer et al. weak words) ──
 VAGUE_ADJECTIVES_ADVERBS: List[str] = [
-    "appropriate", "user-friendly", "intuitive", "fast", "easy",
+    "appropriate", "appropriately", "user-friendly", "intuitive", "fast", "easy",
     "efficient", "convenient", "reasonable", "clean", "modern",
     "simple", "flexible", "robust", "seamless", "properly", "correctly",
-    "nicely", "quickly", "smoothly",
+    "nicely", "quickly", "smoothly", "weak",
 ]
 
 # ── Category 3: Non-verifiable / subjective terms (ISO 29148 smells) ──
 NON_VERIFIABLE_TERMS: List[str] = [
     "as needed", "etc.", "and so on", "if necessary", "where applicable",
     "as appropriate", "as required", "if possible", "where possible",
+    "to be defined", "to be determined", "tbd", "flag for clarification",
+    "not shown in current design",
 ]
 
 # ── Category 4: Vague quantifiers / comparatives (Femmer et al.) ──
