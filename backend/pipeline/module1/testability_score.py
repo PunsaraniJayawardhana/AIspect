@@ -11,9 +11,9 @@ Cypress test generation reliability.
 """
 
 from typing import List, Tuple, Dict, Any
-from backend.integrations.claude_client import call_claude_json
-from backend.config.settings import MODULE1_MODEL
-from backend.prompts.module1_uvri_prompts import (
+from integrations.claude_client import call_claude_json
+from config.settings import MODULE1_MODEL
+from prompts.module1_uvri_prompts import (
     TESTABILITY_SYSTEM_PROMPT,
     build_testability_user_prompt,
 )

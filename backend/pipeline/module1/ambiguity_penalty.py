@@ -8,7 +8,7 @@ No LLM call — fully deterministic, per the design in What_is_UVRI.pdf.
 """
 
 from typing import List, Tuple, Dict, Any
-from backend.lexicons.ambiguous_terms import find_ambiguous_terms, category_of
+from lexicons.ambiguous_terms import find_ambiguous_terms, category_of
 
 
 def compute_ambiguity_penalty(acs: List[str]) -> Tuple[float, Dict[str, Any]]:

@@ -3,23 +3,23 @@ UVRI (UI-Validation Readiness Index) — Module 1's core metric.
 
 UVRI(s) = alpha*C(s) + beta*A(s) + gamma*G(s) + delta*T(s)
 
-Weights are read from backend.config.settings and default to equal
+Weights are read from config.settings and default to equal
 weighting (0.25 each) until replaced with regression/AHP-fitted values
 produced by backend/scripts/fit_uvri_weights.py.
 """
 
 from typing import List, Tuple, Dict, Any
 
-from backend.config.settings import (
+from config.settings import (
     UVRI_WEIGHT_COVERAGE,
     UVRI_WEIGHT_SPECIFICITY,
     UVRI_WEIGHT_AMBIGUITY,
     UVRI_WEIGHT_TESTABILITY,
 )
-from backend.pipeline.module1.coverage_density import compute_coverage_density
-from backend.pipeline.module1.assertion_specificity import compute_assertion_specificity
-from backend.pipeline.module1.ambiguity_penalty import compute_ambiguity_penalty
-from backend.pipeline.module1.testability_score import compute_testability_score
+from pipeline.module1.coverage_density import compute_coverage_density
+from pipeline.module1.assertion_specificity import compute_assertion_specificity
+from pipeline.module1.ambiguity_penalty import compute_ambiguity_penalty
+from pipeline.module1.testability_score import compute_testability_score
 
 
 async def compute_uvri(
