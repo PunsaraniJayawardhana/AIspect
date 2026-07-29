@@ -1,8 +1,8 @@
 import httpx
 import base64
-from typing import List
-from backend.config.settings import (
-    JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, JIRA_PROJECT_KEY
+from typing import List, Optional
+from config.settings import (
+    JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
 
 _AUTH_TOKEN = base64.b64encode(
@@ -14,11 +14,15 @@ _HEADERS = {
 }
 
 
-async def fetch_story_keys() -> List[str]:
-    """Return only the story keys for the configured project."""
+async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
+    """Return story keys for the given project (falls back to the .env default)."""
+    key = project_key or DEFAULT_JIRA_PROJECT_KEY
+    if not key:
+        raise ValueError("project_key was not provided and no default is configured")
+
     url = f"{JIRA_BASE_URL}/rest/api/3/search/jql"
     params = {
-        "jql": f"project={JIRA_PROJECT_KEY} AND issuetype=Story ORDER BY created ASC",
+        "jql": f"project={key} AND issuetype=Story ORDER BY created ASC",
         "fields": "summary",
         "maxResults": 100,
     }
@@ -29,7 +33,8 @@ async def fetch_story_keys() -> List[str]:
 
 
 async def fetch_single_story(story_key: str) -> dict:
-    """Fetch ONE story's full content by key. Preserves the raw ADF tree."""
+    """Fetch ONE story's full content by key. Works for any project — the
+    key itself (e.g. 'EXC-1', 'PROJ-42') already identifies the project."""
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
     params = {"fields": "summary,description,priority,status,attachment"}
 
@@ -38,23 +43,37 @@ async def fetch_single_story(story_key: str) -> dict:
         response.raise_for_status()
         issue = response.json()
 
+    attachments = []
+    for att in issue["fields"].get("attachment", []) or []:
+        attachments.append({
+            "id": att.get("id"),
+            "filename": att.get("filename"),
+            "mime_type": att.get("mimeType", ""),
+            "content_url": att.get("content"),
+            "size": att.get("size"),
+        })
+
     return {
         "id": issue["key"],
         "summary": issue["fields"]["summary"],
         "description_adf": issue["fields"].get("description"),
         "priority": (issue["fields"].get("priority") or {}).get("name"),
         "status": (issue["fields"].get("status") or {}).get("name"),
-        "attachments": issue["fields"].get("attachment", []),
+        "attachments": attachments,
     }
 
 
-async def fetch_media_as_base64(media_uuid: str) -> str:
-    """Download a Figma design image embedded as a media node."""
-    url = f"{JIRA_BASE_URL}/rest/api/3/attachment/content/{media_uuid}"
+async def fetch_attachment_as_base64(content_url: str) -> str:
+    """Download a Jira attachment from its content URL and return base64 bytes."""
     async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
-        response = await client.get(url, headers=_HEADERS)
+        response = await client.get(content_url, headers=_HEADERS)
         response.raise_for_status()
         return base64.b64encode(response.content).decode()
+
+
+def _project_key_from_story_key(story_key: str) -> str:
+    """Derive the project key from a story key like 'EXC-1' -> 'EXC'."""
+    return story_key.split("-")[0]
 
 
 async def create_bug_ticket(
@@ -63,11 +82,17 @@ async def create_bug_ticket(
     parent_story_key: str,
     severity: str,
 ) -> dict:
-    """Create a Jira bug ticket linked to the originating user story."""
+    """
+    Create a Jira bug ticket in the SAME project as the originating story,
+    so bugs for a story in any project land in that project, never in
+    whatever DEFAULT_JIRA_PROJECT_KEY happens to be set to.
+    """
+    project_key = _project_key_from_story_key(parent_story_key)
+
     url = f"{JIRA_BASE_URL}/rest/api/3/issue"
     payload = {
         "fields": {
-            "project": {"key": JIRA_PROJECT_KEY},
+            "project": {"key": project_key},
             "summary": summary,
             "issuetype": {"name": "Bug"},
             "description": {

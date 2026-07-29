@@ -1,0 +1,90 @@
+{
+  "story_key": "EXC-1",
+  "screen_type": "signup",
+  "uvri_pre": 0.8,
+  "uvri_post": 0.8,
+  "delta": 0.0,
+  "subterms_pre": {
+    "coverage": 1.0,
+    "specificity": 0.6,
+    "ambiguity": 0.85,
+    "testability": 0.75
+  },
+  "subterms_post": {
+    "coverage": 1.0,
+    "specificity": 0.6,
+    "ambiguity": 0.85,
+    "testability": 0.75
+  },
+  "explicit_ACs": [
+    "Users can register using a manual registration form with the following fields: — Name: Required. Error if empty: \"Name is required\".",
+    "Users can register using a manual registration form with the following fields: — Email: Required. Must be a valid email format. Error if invalid: \"Invalid email number\".",
+    "Users can register using a manual registration form with the following fields: — Password: Required. Masked input. Error if empty: \"Password is required\".",
+    "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+    "Users can register using a manual registration form with the following fields: — Create Account Button: Validates all fields and creates the account. On success, redirects to the Home Screen.",
+    "Users can register quickly using their existing Google identity: — Sign up with Google Button: Initiates the Google OAuth 2.0 flow when tapped.",
+    "There is a path for users who already have an account to prevent duplicate registrations: — Log in Link: Text \"Log in\" located at the bottom of the form.",
+    "If the email is already registered, display the message: \"An account with this email already exists\"."
+  ],
+  "implicit_ACs": [
+    "The sign up screen should display a prominent heading or title (e.g., 'Create Account' or 'Sign Up') at the top of the form",
+    "The sign up screen should display the Exclusive platform logo or brand name visibly, typically at the top of the screen",
+    "The sign up screen should display a short subtitle or descriptive text beneath the main heading to provide context for the registration form (e.g., 'Enter your details below')",
+    "The Name input field should have a visible label or placeholder text identifying it as the 'Name' field",
+    "The Email input field should have a visible label or placeholder text identifying it as the 'Email' field",
+    "The Password input field should have a visible label or placeholder text identifying it as the 'Password' field",
+    "The Confirm Password input field should have a visible label or placeholder text identifying it as the 'Confirm Password' field",
+    "The Password field should include a visible show/hide toggle icon to allow the user to reveal or mask the entered password",
+    "The Confirm Password field should include a visible show/hide toggle icon to allow the user to reveal or mask the entered confirmation password",
+    "A visual divider or separator (e.g., a horizontal line with 'or' label) should be displayed between the manual registration form and the Sign up with Google button",
+    "The Sign up with Google button should display the recognisable Google logo or icon alongside its label text",
+    "The bottom of the form should display accompanying static text before the 'Log in' link, such as 'Already have an account?' to provide context for the link"
+  ],
+  "verified_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Confirm Password Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The registration form does not include a 'Confirm Password' input field, which is required by the acceptance criteria.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+      "feedback": "The 'Confirm Password Field' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Password Show/Hide Toggle",
+      "discrepancy_type": "Missing Element",
+      "description": "The Password input field does not display a show/hide toggle icon to allow the user to reveal or mask the entered password.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The Password field should include a visible show/hide toggle icon to allow the user to reveal or mask the entered password",
+      "feedback": "The 'Password Show/Hide Toggle' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Divider between form and Google button",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visual divider or 'or' separator displayed between the 'Create Account' button and the 'Sign up with Google' button.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "A visual divider or separator (e.g., a horizontal line with 'or' label) should be displayed between the manual registration form and the Sign up with Google button",
+      "feedback": "The 'Divider between form and Google button' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "tests": [],
+  "cypress_results": [],
+  "bugs_created": []
+}
