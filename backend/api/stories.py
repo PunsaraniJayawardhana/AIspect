@@ -6,7 +6,7 @@ import traceback
 from backend.config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
-from backend.integrations.jira_client import fetch_story_keys
+from integrations.jira_client import fetch_story_keys
 
 router = APIRouter(prefix="/api/stories", tags=["stories"])
 
@@ -139,8 +139,8 @@ async def debug_adf(story_key: str):
 async def debug_claude():
     """Verify the Anthropic API key works."""
     try:
-        from backend.integrations.claude_client import call_claude_json
-        from backend.config.settings import MODULE1_MODEL
+        from integrations.claude_client import call_claude_json
+        from config.settings import MODULE1_MODEL
 
         result = await call_claude_json(
             model=MODULE1_MODEL,
