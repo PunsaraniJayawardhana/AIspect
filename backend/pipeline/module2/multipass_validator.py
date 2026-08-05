@@ -1,11 +1,67 @@
 import json
 import os
 import base64
+import io
 import anthropic
 from typing import List, Dict, Any
 from .validation_prompts import SYSTEM_PROMPT, VALIDATION_PROMPT_VARIANTS
 
 TEMPERATURE_SCHEDULE = [0.0, 0.3, 0.5, 0.7, 1.0]
+
+# Claude API maximum image dimension
+MAX_IMAGE_DIMENSION = 7900  # slightly below 8000 to be safe
+
+
+def _resize_image_if_needed(img_b64: str) -> str:
+    """
+    Resize image if either dimension exceeds Claude's 8000px limit.
+    Returns original base64 if within limits, resized base64 otherwise.
+    """
+    try:
+        from PIL import Image
+
+        img_bytes = base64.b64decode(img_b64)
+        img = Image.open(io.BytesIO(img_bytes))
+
+        width, height = img.size
+        print(f"[Module2] Image size: {width}x{height}px")
+
+        # No resize needed
+        if width <= MAX_IMAGE_DIMENSION and height <= MAX_IMAGE_DIMENSION:
+            return img_b64
+
+        # Calculate new size maintaining aspect ratio
+        scale = min(
+            MAX_IMAGE_DIMENSION / width,
+            MAX_IMAGE_DIMENSION / height
+        )
+        new_width  = int(width  * scale)
+        new_height = int(height * scale)
+
+        print(f"[Module2] Resizing image from {width}x{height} "
+              f"to {new_width}x{new_height}")
+
+        img_resized = img.resize(
+            (new_width, new_height),
+            Image.LANCZOS
+        )
+
+        buffer = io.BytesIO()
+        fmt = img.format if img.format else "JPEG"
+        img_resized.save(buffer, format=fmt, quality=95)
+        buffer.seek(0)
+
+        resized_b64 = base64.b64encode(buffer.read()).decode()
+        print(f"[Module2] Image resized successfully")
+        return resized_b64
+
+    except ImportError:
+        print("[Module2] WARNING: Pillow not installed. "
+              "Run: pip install Pillow --break-system-packages")
+        return img_b64
+    except Exception as e:
+        print(f"[Module2] Image resize failed: {e} — using original")
+        return img_b64
 
 
 def _detect_media_type(img_b64: str) -> str:
@@ -19,7 +75,7 @@ def _detect_media_type(img_b64: str) -> str:
         return "image/gif"
     if header[:4] == b'RIFF' and header[8:12] == b'WEBP':
         return "image/webp"
-    return "image/jpeg"  # safe default
+    return "image/jpeg"
 
 
 def run_single_pass(
@@ -30,12 +86,16 @@ def run_single_pass(
     model: str,
 ) -> List[Dict[str, Any]]:
     criteria_text = "\n".join(f"- {c}" for c in criteria)
-    prompt_text = VALIDATION_PROMPT_VARIANTS[variant_index].format(criteria=criteria_text)
+    prompt_text = VALIDATION_PROMPT_VARIANTS[variant_index].format(
+        criteria=criteria_text
+    )
     temperature = TEMPERATURE_SCHEDULE[variant_index]
 
     content = []
     for img_b64 in design_images:
-        media_type = _detect_media_type(img_b64)  # auto-detect instead of hardcoded
+        # Resize if needed before sending to Claude
+        img_b64 = _resize_image_if_needed(img_b64)
+        media_type = _detect_media_type(img_b64)
         print(f"[Module2] Detected image format: {media_type}")
         content.append({
             "type": "image",
@@ -50,7 +110,7 @@ def run_single_pass(
     try:
         response = client.messages.create(
             model=model,
-            max_tokens=2000,
+            max_tokens=4000,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": content}],
             temperature=temperature,
@@ -88,12 +148,14 @@ async def run_multipass_validation(
     for i in range(n):
         variant_idx = i % len(VALIDATION_PROMPT_VARIANTS)
         print(f"[Module2] Running validation pass {i + 1}/{n} "
-              f"(variant={variant_idx + 1}, temp={TEMPERATURE_SCHEDULE[variant_idx]})")
+              f"(variant={variant_idx + 1}, "
+              f"temp={TEMPERATURE_SCHEDULE[variant_idx]})")
 
         result = run_single_pass(
             client, enriched_ACs, design_images_b64, variant_idx, model
         )
-        print(f"[Module2] Pass {i + 1} found {len(result)} discrepancy candidate(s)")
+        print(f"[Module2] Pass {i + 1} found "
+              f"{len(result)} discrepancy candidate(s)")
         all_pass_results.append(result)
 
     return all_pass_results

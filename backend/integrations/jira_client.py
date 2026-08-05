@@ -4,7 +4,7 @@ import os
 import json
 import logging
 from typing import List, Optional
-from backend.config.settings import (
+from config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
 

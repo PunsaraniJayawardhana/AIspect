@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 import httpx
 import logging
@@ -20,8 +21,57 @@ from backend.pipeline.module3.test_generator import run_test_generator as genera
 from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
 
 
-RESULTS_DIR = pathlib.Path("output/results")
+RESULTS_DIR        = pathlib.Path("output/results")
 MODULE2_OUTPUT_DIR = pathlib.Path("output/module2_output")
+
+# Keywords that indicate dynamic/conditional behaviour
+# ACs containing these cannot be validated from a static design image
+DYNAMIC_AC_KEYWORDS = [
+    "on submit", "on click", "after submit", "on valid",
+    "on invalid", "on success", "on error", "on empty",
+    "when user", "after user", "displays an error",
+    "shows a success", "shows confirmation", "shows message",
+    "displays a message", "displays an inline",
+    "redirects", "navigates to", "routes to",
+    "if authenticated", "if guest", "if the user is",
+    "opens in a new tab", "target=", "target=\"_blank\"",
+    "mailto:", "tel:", "clickable mailto", "clickable tel",
+    "sourced from", "central configuration", "cms",
+    "global component", "rendered on all pages",
+    "responsive", "stack vertically", "hover state",
+    "open in a new tab", "new tab",
+]
+
+
+def classify_acs(enriched_ACs: list) -> tuple:
+    """
+    Separate enriched ACs into two categories:
+    - static_ACs: validatable from a static design image
+    - dynamic_ACs: require live application testing (Module 3)
+
+    Returns (static_ACs, dynamic_ACs)
+    """
+    static_ACs = []
+    dynamic_ACs = []
+
+    for ac in enriched_ACs:
+        ac_lower = ac.lower()
+        is_dynamic = any(
+            keyword in ac_lower
+            for keyword in DYNAMIC_AC_KEYWORDS
+        )
+        if is_dynamic:
+            dynamic_ACs.append(ac)
+            print(f"[AC Classifier] DYNAMIC (skipped for Module 2): "
+                  f"{ac[:80]}...")
+        else:
+            static_ACs.append(ac)
+
+    print(f"\n[AC Classifier] Total ACs: {len(enriched_ACs)}")
+    print(f"[AC Classifier] Static  (→ Module 2): {len(static_ACs)}")
+    print(f"[AC Classifier] Dynamic (→ Module 3): {len(dynamic_ACs)}\n")
+
+    return static_ACs, dynamic_ACs
 
 
 async def emit(job: Job, step: str, payload: dict = None):
@@ -52,18 +102,22 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
     try:
         job.status = "running"
 
-        # ── 1. Fetch the ticket ─────────────────────────────────────
+        # ── Read N from environment variable ────────────────────────
+        n_passes = int(os.environ.get("MODULE2_PASSES", 5))
+        print(f"[Module2] N passes set to: {n_passes}")
+
+        # ── 1. Fetch the ticket ──────────────────────────────────
         await emit(job, "fetching_ticket")
         story = await fetch_single_story(story_key)
 
         # Skip tickets with no description
         if story["description_adf"] is None:
             skip_record = {
-                "story_key": story_key,
-                "story_summary": story.get("summary", ""),
+                "story_key":      story_key,
+                "story_summary":  story.get("summary", ""),
                 "status_at_skip": story.get("status"),
-                "skipped": True,
-                "reason": "null description",
+                "skipped":        True,
+                "reason":         "null description",
             }
             _persist_result(story_key, skip_record)
             job.status = "completed"
@@ -71,57 +125,82 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             await emit(job, "done", job.result)
             return
 
-        # ── 2. Parse the ADF tree ───────────────────────────────────
+        # ── 2. Parse the ADF tree ────────────────────────────────
         await emit(job, "parsing_adf")
         parsed = parse_adf(story["description_adf"])
+        story_text = parsed.get("story_text", "")
+        nav_path = parsed.get("nav_path", "")
 
-        # ── 3. Download design images ───────────────────────────────
+        # ── 3. Download design images ────────────────────────────
         image_attachments = [
             a for a in story["attachments"]
             if a.get("mime_type", "").startswith("image/")
         ]
-        await emit(job, "downloading_design_images",
-                   {"count": len(image_attachments)})
+        await emit(job, "downloading_design_images", {"count": len(image_attachments)})
         design_images_b64 = []
         for attachment in image_attachments:
             img = await fetch_attachment_as_base64(attachment["content_url"])
             design_images_b64.append(img)
 
-        # ── 4. Module 1 — Screen classification ─────────────────────
+        # ── 4. Module 1 — Screen classification ──────────────────
         await emit(job, "classifying_screen_type")
         screen_type = await classify_screen_type(parsed)
         await emit(job, "screen_type_classified", {"screen_type": screen_type})
 
-        # ── 5. Module 1 — UVRI pre-enrichment ───────────────────────
+        # ── 5. Module 1 — UVRI pre-enrichment ────────────────────
         await emit(job, "computing_uvri_pre")
         uvri_pre, sub_pre = await compute_uvri(parsed["explicit_ACs"], screen_type)
-        await emit(job, "uvri_pre_done",
-                   {"uvri": uvri_pre, "subterms": sub_pre})
+        await emit(job, "uvri_pre_done", {"uvri": uvri_pre, "subterms": sub_pre})
 
-        # ── 6. Module 1 — Implicit inference ────────────────────────
+        # ── 6. Module 1 — Implicit inference ─────────────────────
         await emit(job, "running_implicit_inference")
         implicit_ACs = await infer_implicit_elements(parsed, screen_type)
         await emit(job, "inference_done", {"implicit_ACs": implicit_ACs})
 
-        enriched_ACs = parsed["explicit_ACs"] + implicit_ACs
+        explicit_ACs = parsed["explicit_ACs"]
+        enriched_ACs = explicit_ACs + implicit_ACs
+        canonical_acs = [
+            {
+                "ac_id": f"AC-{idx:02d}",
+                "text": ac,
+                "type": "explicit" if idx <= len(explicit_ACs) else "implicit",
+            }
+            for idx, ac in enumerate(enriched_ACs, start=1)
+        ]
 
-        # ── 7. Module 1 — UVRI post-enrichment ──────────────────────
+        # ── 7. Module 1 — UVRI post-enrichment ───────────────────
         await emit(job, "computing_uvri_post")
         uvri_post, sub_post = await compute_uvri(enriched_ACs, screen_type)
         await emit(job, "uvri_post_done", {
-            "uvri": uvri_post,
+            "uvri":     uvri_post,
             "subterms": sub_post,
-            "delta": uvri_post - uvri_pre,
+            "delta":    uvri_post - uvri_pre,
+        })
+
+        # ── 7.5 — AC Pre-Classification ──────────────────────────
+        await emit(job, "classifying_acs")
+        static_ACs, dynamic_ACs = classify_acs(enriched_ACs)
+        await emit(job, "acs_classified", {
+            "static_count":  len(static_ACs),
+            "dynamic_count": len(dynamic_ACs),
         })
 
         # ── 8. Module 2 — Multi-pass validation ─────────────────────
-        await emit(job, "module2_started", {"total_passes": 5})
+        # Only static ACs are sent to Module 2
+        # Dynamic ACs bypass Module 2 and go directly to Module 3
+        await emit(job, "module2_started", {"total_passes": n_passes})
         passes = await run_multipass_validation(
-            enriched_ACs, design_images_b64, n=5
+            static_ACs,
+            design_images_b64,
+            n=n_passes
         )
         await emit(job, "module2_passes_complete")
 
-        verified = compute_confidence_index(passes)
+        verified = compute_confidence_index(
+            passes,
+            n_passes=n_passes,
+            canonical_acs=canonical_acs,
+        )
 
         # Split by confidence level
         high_confidence = [
@@ -140,17 +219,20 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
 
         # Save dedicated Module 3 input file
         module2_output = {
-            "ticket_id": story_key,
-            "screen_type": screen_type,
-            "high_confidence": high_confidence,
+            "ticket_id":    story_key,
+            "screen_type":  screen_type,
+            "high_confidence":   high_confidence,
             "medium_confidence": medium_confidence,
             "all_discrepancies": verified,
+            "dynamic_ACs":       dynamic_ACs,
             "summary": {
-                "total_candidates": len(verified),
-                "high": len(high_confidence),
-                "medium": len(medium_confidence),
-                "low": len(low_confidence),
-                "n_passes": 5,
+                "total_candidates":      len(verified),
+                "high":                  len(high_confidence),
+                "medium":                len(medium_confidence),
+                "low":                   len(low_confidence),
+                "n_passes":              n_passes,
+                "static_acs_validated":  len(static_ACs),
+                "dynamic_acs_deferred":  len(dynamic_ACs),
             }
         }
         _persist_module2_output(story_key, module2_output)
@@ -160,24 +242,16 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         await emit(job, "module2_done", {"verified_discrepancies": verified})
 
         # ── 9. Module 3 — Test generation ───────────────────────────
-        # Only HIGH confidence discrepancies are passed to Module 3
         await emit(job, "generating_tests")
-        # Debug: log the callable and its signature to diagnose invocation issues
-        logging.getLogger(__name__).info("generate_dual_mode_tests object: %r", generate_dual_mode_tests)
-        try:
-            sig = inspect.signature(generate_dual_mode_tests)
-        except Exception:
-            sig = None
-        logging.getLogger(__name__).info("generate_dual_mode_tests signature: %s", sig)
-
         tests = generate_dual_mode_tests(
             verified,
-            parsed["explicit_ACs"],
+            explicit_ACs,
             implicit_ACs,
-            parsed.get("story_text", ""),
+            story_text,
             story_key,
-            app_url,
-            parsed.get("nav_path", ""),
+            screen_type=screen_type,
+            app_url=app_url,
+            nav_path=nav_path,
         )
         await emit(job, "tests_generated", {"test_count": len(tests)})
 
@@ -188,6 +262,22 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             await emit(job, "running_cypress")
             cypress_results = await execute_cypress(tests, app_url)
             await emit(job, "cypress_done", {"results": cypress_results})
+
+            cypress_object_ids = {id(item) for item in cypress_results}
+
+            def _matches_record(record: dict, discrepancy_id: str, tc_id: str) -> bool:
+                if discrepancy_id and record.get("discrepancy_id") == discrepancy_id:
+                    return True
+                if tc_id and record.get("tc_id") == tc_id:
+                    return True
+                return False
+
+            def _set_ticket(records, ticket_key: str, discrepancy_id: str, tc_id: str, skip_shared: bool = False):
+                for record in records or []:
+                    if skip_shared and id(record) in cypress_object_ids:
+                        continue
+                    if _matches_record(record, discrepancy_id, tc_id):
+                        record["jira_ticket"] = ticket_key
 
             for result in get_confirmed_faults(cypress_results):
                 await emit(job, "creating_bug_ticket", {"discrepancy": result.get("discrepancy_id")})
@@ -207,26 +297,35 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
                     }
                 )
 
+                ticket_key = bug["key"]
+                discrepancy_id = result.get("discrepancy_id")
+                tc_id = result.get("tc_id")
+
+                _set_ticket(tests, ticket_key, discrepancy_id, tc_id)
+                _set_ticket(cypress_results, ticket_key, discrepancy_id, tc_id, skip_shared=True)
+
         await emit(job, "module3_done", {"bugs_created": len(bugs_created)})
 
         # ── 11. Final result ────────────────────────────────────────
         job.result = {
-            "story_key": story_key,
+            "story_key":   story_key,
             "screen_type": screen_type,
-            "uvri_pre": uvri_pre,
-            "uvri_post": uvri_post,
-            "delta": uvri_post - uvri_pre,
-            "subterms_pre": sub_pre,
+            "uvri_pre":    uvri_pre,
+            "uvri_post":   uvri_post,
+            "delta":       uvri_post - uvri_pre,
+            "subterms_pre":  sub_pre,
             "subterms_post": sub_post,
-            "explicit_ACs": parsed["explicit_ACs"],
-            "implicit_ACs": implicit_ACs,
-            "all_discrepancies": verified,
-            "high_confidence_discrepancies": high_confidence,
+            "explicit_ACs":  explicit_ACs,
+            "implicit_ACs":  implicit_ACs,
+            "static_ACs":    static_ACs,
+            "dynamic_ACs":   dynamic_ACs,
+            "all_discrepancies":            verified,
+            "high_confidence_discrepancies":   high_confidence,
             "medium_confidence_discrepancies": medium_confidence,
-            "low_confidence_discrepancies": low_confidence,
-            "tests": tests,
+            "low_confidence_discrepancies":    low_confidence,
+            "tests":           tests,
             "cypress_results": cypress_results,
-            "bugs_created": bugs_created,
+            "bugs_created":    bugs_created,
         }
         _persist_result(story_key, job.result)
         job.status = "completed"
