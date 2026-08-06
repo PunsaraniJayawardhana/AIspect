@@ -1,5 +1,5 @@
 """Load output/module2_output/<story>.json and run prioritize_discrepancies.
-Run with: python -m backend.scripts.test_tpri_fixture EXC-2
+Run with: python -m backend.scripts.test_tpri_pipeline EXC-2
 """
 import json
 import os

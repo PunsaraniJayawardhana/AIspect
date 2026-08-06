@@ -1,10 +1,9 @@
 import httpx
 import base64
-import os
 import json
 import logging
 from typing import List, Optional
-from config.settings import (
+from backend.config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
 
@@ -17,6 +16,14 @@ _HEADERS = {
     "Accept": "application/json",
     "Authorization": f"Basic {_AUTH_TOKEN}",
 }
+
+
+def _response_json_utf8(response: httpx.Response) -> dict:
+    """Decode JSON with an explicit UTF-8 fallback to avoid mojibake."""
+    try:
+        return response.json()
+    except ValueError:
+        return json.loads(response.content.decode("utf-8", errors="replace"))
 
 
 async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
@@ -34,52 +41,14 @@ async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(url, headers=_HEADERS, params=params)
         response.raise_for_status()
-        return [issue["key"] for issue in response.json().get("issues", [])]
+        payload = _response_json_utf8(response)
+        return [issue["key"] for issue in payload.get("issues", [])]
 
 
-async def fetch_single_story(story_key: str, use_fixture: bool = False) -> dict:
+async def fetch_single_story(story_key: str) -> dict:
     """Fetch ONE story's full content by key. Works for any project — the
     key itself (e.g. 'EXC-1', 'PROJ-42') already identifies the project.
-
-    If use_fixture=True, load a local fixture from
-    `backend/scripts/fixtures/{story_key}_module1.json` instead of calling
-    Jira. This is an explicit opt-in only — never triggered automatically.
     """
-    if use_fixture:
-        fixture_dir = os.path.join(os.path.dirname(__file__), "..", "scripts", "fixtures")
-        fixture_path = os.path.join(fixture_dir, f"{story_key}_module1.json")
-        if not os.path.exists(fixture_path):
-            raise FileNotFoundError(f"Fixture requested but not found: {fixture_path}")
-
-        logger.info("Using local fixture for story %s: %s", story_key, fixture_path)
-        with open(fixture_path, "r", encoding="utf-8") as fh:
-            data = json.load(fh)
-
-        story_text = data.get("story_text", "")
-        explicit_acs = data.get("explicit_ACs", [])
-
-        content = []
-        content.append({"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "User story"}]})
-        content.append({"type": "paragraph", "content": [{"type": "text", "text": story_text}]})
-        content.append({"type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "Acceptance criteria"}]})
-        bullets = {"type": "bulletList", "content": []}
-        for ac in explicit_acs:
-            ac_text = ac.get("text") if isinstance(ac, dict) else str(ac)
-            bullets["content"].append({
-                "type": "listItem",
-                "content": [{"type": "paragraph", "content": [{"type": "text", "text": ac_text}]}]
-            })
-        content.append(bullets)
-
-        return {
-            "id": story_key,
-            "summary": story_text,
-            "description_adf": {"type": "doc", "content": content},
-            "priority": None,
-            "status": None,
-            "attachments": [],
-        }
-
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
     params = {"fields": "summary,description,priority,status,attachment"}
 
@@ -87,7 +56,7 @@ async def fetch_single_story(story_key: str, use_fixture: bool = False) -> dict:
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(url, headers=_HEADERS, params=params)
         response.raise_for_status()
-        issue = response.json()
+        issue = _response_json_utf8(response)
 
     attachments = []
     for att in issue["fields"].get("attachment", []) or []:
@@ -177,4 +146,4 @@ async def create_bug_ticket(
             json=payload,
         )
         response.raise_for_status()
-        return response.json()
+        return _response_json_utf8(response)

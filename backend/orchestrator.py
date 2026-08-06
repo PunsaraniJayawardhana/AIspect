@@ -1,6 +1,6 @@
 # backend/orchestrator.py (relevant section)
 
-from pipeline.module2_validator import run_module2
+from backend.pipeline.module2_validator import run_module2
 
 def run_pipeline(ticket_id: str):
     # ... Module 1 runs first ...
@@ -10,7 +10,7 @@ def run_pipeline(ticket_id: str):
     module2_output = run_module2(module1_output)
     
     # Save output for debugging and Module 3 handoff
-    with open(f"output/module2_fixtures/{ticket_id}_module2.json", "w") as f:
+    with open(f"output/module2_output/{ticket_id}.json", "w", encoding="utf-8") as f:
         import json
         json.dump(module2_output, f, indent=2)
     

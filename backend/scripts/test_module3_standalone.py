@@ -1,6 +1,8 @@
 import argparse
 import json
+import os
 import sys
+import asyncio
 
 from backend.pipeline.module3.apfd_evaluator import (
     build_fault_map,
@@ -10,9 +12,9 @@ from backend.pipeline.module3.apfd_evaluator import (
 )
 from backend.pipeline.module3.cypress_runner import get_confirmed_faults, run_cypress_tests
 from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
-from backend.pipeline.module3.fixture_loader import get_module1_inputs, get_module2_inputs
 from backend.pipeline.module3.llm_client import get_usage_summary, reset_usage_log
 from backend.pipeline.module3.test_generator import run_test_generator
+from backend.integrations.jira_client import create_bug_ticket
 
 
 def print_summary(story_key, app_url, tests):
@@ -48,12 +50,30 @@ def print_summary(story_key, app_url, tests):
     print(f"  Providers: {usage['by_provider']}")
 
 
+def _matches_record(record: dict, discrepancy_id: str, tc_id: str) -> bool:
+    if discrepancy_id and record.get("discrepancy_id") == discrepancy_id:
+        return True
+    if tc_id and record.get("tc_id") == tc_id:
+        return True
+    return False
+
+
+def _set_ticket(records, ticket_key: str, discrepancy_id: str, tc_id: str):
+    for record in records or []:
+        if _matches_record(record, discrepancy_id, tc_id):
+            record["jira_ticket"] = ticket_key
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run Module 3 standalone for a story.")
     parser.add_argument("story_key")
-    parser.add_argument("app_url", nargs="?", default=None)
+    parser.add_argument("app_url", nargs="?", default=None, help="Target app URL (backward-compatible positional).")
+    parser.add_argument("--app-url", dest="app_url_flag", default=None, help="Target app URL (preferred).")
+    parser.add_argument("--nav-path", default="", help="Optional route path override appended to app URL.")
     parser.add_argument("--ablation", action="store_true", help="Run APFD ablation study")
     args = parser.parse_args()
+
+    resolved_app_url = args.app_url_flag or args.app_url
 
     reset_usage_log()
 
@@ -62,8 +82,9 @@ def main():
 
     explicit_acs = real_result.get("explicit_ACs", [])
     implicit_acs = real_result.get("implicit_ACs", [])
+    screen_type = real_result.get("screen_type")
     story_text = ""  # not persisted in output/results/, keeping empty is fine for test generation
-    nav_path = ""
+    nav_path = args.nav_path or ""
     verified_discrepancies = real_result.get("all_discrepancies", [])
 
     tests = run_test_generator(
@@ -72,23 +93,65 @@ def main():
         implicit_acs,
         story_text,
         args.story_key,
-        app_url=args.app_url,
+        screen_type=screen_type,
+        app_url=resolved_app_url,
         nav_path=nav_path,
     )
 
-    if args.app_url:
-        tests = run_cypress_tests(tests)
+    bugs_created = []
+    cypress_results = []
+    if resolved_app_url:
+        defect_only_mode = str(os.environ.get("MODULE3_DEFECT_ONLY", "")).strip().lower() in {"1", "true", "yes", "on"}
+        cypress_results = run_cypress_tests(tests, defects_only=defect_only_mode)
+        tests = cypress_results
 
-    export_to_docx(tests, args.story_key, f"backend/scripts/fixtures/{args.story_key}_test_cases.docx")
-    export_to_markdown(tests, args.story_key, f"backend/scripts/fixtures/{args.story_key}_test_cases.md")
+        for result in get_confirmed_faults(cypress_results):
+            bug = asyncio.run(
+                create_bug_ticket(
+                    summary=f"[AIspect] {result.get('scenario', result.get('discrepancy_id'))}",
+                    description=(
+                        f"{result.get('expected_result', '')} | "
+                        f"{result.get('scenario', '')}"
+                    ).strip(" |"),
+                    parent_story_key=args.story_key,
+                    severity=result.get("priority", "Medium"),
+                )
+            )
+            bugs_created.append(
+                {
+                    "ticket_key": bug["key"],
+                    "discrepancy_id": result.get("discrepancy_id"),
+                }
+            )
 
-    output_path = f"backend/scripts/fixtures/{args.story_key}_module3_output.json"
+            _set_ticket(
+                tests,
+                bug["key"],
+                result.get("discrepancy_id"),
+                result.get("tc_id"),
+            )
+
+    export_to_docx(tests, args.story_key, f"output/module3/{args.story_key}_test_cases.docx")
+    export_to_markdown(tests, args.story_key, f"output/module3/{args.story_key}_test_cases.md")
+
+    output_path = f"output/module3/{args.story_key}_module3_output.json"
     with open(output_path, "w", encoding="utf-8") as handle:
-        json.dump({"story_key": args.story_key, "tests": tests}, handle, indent=2)
+        json.dump(
+            {
+                "story_key": args.story_key,
+                "app_url": resolved_app_url,
+                "nav_path": nav_path,
+                "tests": tests,
+                "cypress_results": cypress_results,
+                "bugs_created": bugs_created,
+            },
+            handle,
+            indent=2,
+        )
 
-    print_summary(args.story_key, args.app_url, tests)
+    print_summary(args.story_key, resolved_app_url, tests)
 
-    if args.app_url and args.ablation:
+    if resolved_app_url and args.ablation:
         mode2_tests = [test for test in tests if test.get("mode") == "defect_first"]
         if not mode2_tests:
             print("No defect-first tests were available for ablation study.")

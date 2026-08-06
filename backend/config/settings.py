@@ -36,3 +36,7 @@ CI_MEDIUM_THRESHOLD = float(os.getenv("CI_MEDIUM_THRESHOLD", "0.60"))
 
 # CORS
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+FRONTEND_ORIGIN_REGEX = os.getenv(
+    "FRONTEND_ORIGIN_REGEX",
+    r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+)

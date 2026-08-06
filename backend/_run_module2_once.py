@@ -1,5 +1,5 @@
 import json, base64, os
-from pipeline.module2_validator import run_module2
+from backend.pipeline.module2_validator import run_module2
 
 img_path='test_screen.png'
 if not os.path.exists(img_path):

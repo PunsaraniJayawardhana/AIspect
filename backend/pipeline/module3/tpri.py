@@ -121,7 +121,6 @@ def compute_tpri(ci, discrepancy_type, ac_text, user_story, all_acs, weights=Non
         "tpri_score": round(score, 4),
     }
 
-
 def prioritize_discrepancies(discrepancies, enriched_acs, user_story, weights=None):
     prioritized = []
     ac_texts = [
@@ -150,5 +149,4 @@ def prioritize_discrepancies(discrepancies, enriched_acs, user_story, weights=No
     prioritized.sort(key=lambda item: (item["tpri_score"], item.get("confidence_index", 0.0)), reverse=True)
     for rank, item in enumerate(prioritized, start=1):
         item["priority_rank"] = rank
-
     return prioritized

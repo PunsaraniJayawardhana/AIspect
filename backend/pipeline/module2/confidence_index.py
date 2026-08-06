@@ -13,6 +13,7 @@ SEVERITY_MAP = {
 }
 
 VALID_DISCREPANCY_TYPES = set(SEVERITY_MAP.keys())
+CANONICAL_AC_MATCH_THRESHOLD = 0.45
 
 # Phrases that indicate Claude contradicted its own finding
 SELF_CONTRADICTION_PHRASES = [
@@ -206,16 +207,59 @@ def _generate_feedback(discrepancy: Dict) -> str:
     )
 
 
+def _build_canonical_ac_rows(canonical_acs: List[Any]) -> List[Dict[str, str]]:
+    rows: List[Dict[str, str]] = []
+    for idx, item in enumerate(canonical_acs or [], start=1):
+        if isinstance(item, dict):
+            ac_id = item.get("ac_id") or f"AC-{idx:02d}"
+            text = item.get("text") or item.get("ac_text") or ""
+        else:
+            ac_id = f"AC-{idx:02d}"
+            text = str(item)
+        rows.append({"ac_id": ac_id, "text": text})
+    return rows
+
+
+def _resolve_canonical_requirement_id(
+    violated_criterion: str,
+    canonical_rows: List[Dict[str, str]],
+    threshold: float = CANONICAL_AC_MATCH_THRESHOLD,
+) -> str:
+    if not canonical_rows:
+        return ""
+
+    normalized_violated = _normalize_text(violated_criterion or "")
+    if normalized_violated:
+        for row in canonical_rows:
+            if _normalize_text(row.get("text", "")) == normalized_violated:
+                return row.get("ac_id", "")
+
+    best_row = None
+    best_score = 0.0
+    for row in canonical_rows:
+        score = _lexical_similarity(violated_criterion or "", row.get("text", ""))
+        if score > best_score:
+            best_row = row
+            best_score = score
+
+    if best_row and best_score >= threshold:
+        return best_row.get("ac_id", "")
+
+    return ""
+
+
 def compute_confidence_index(
     all_pass_results: List[List[Dict[str, Any]]],
     n_passes: int = 5,
     high_threshold: float = 0.80,
     medium_threshold: float = 0.60,
+    canonical_acs: List[Any] = None,
 ) -> List[Dict[str, Any]]:
 
     # Initialise Claude client for semantic grouping
     model = os.environ.get("MODULE2_MODEL", "claude-sonnet-4-6")
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+    canonical_rows = _build_canonical_ac_rows(canonical_acs or [])
 
     canonical_groups: List[Dict] = []
 
@@ -290,8 +334,14 @@ def compute_confidence_index(
 
         severity = SEVERITY_MAP.get(group["discrepancy_type"], "MEDIUM")
 
+        fallback_requirement_id = f"AC-{ac_idx + 1:02d}"
+        resolved_requirement_id = _resolve_canonical_requirement_id(
+            group.get("violated_criterion", ""),
+            canonical_rows,
+        )
+
         discrepancy = {
-            "requirement_id": f"AC-{ac_idx + 1:02d}",
+            "requirement_id": resolved_requirement_id or fallback_requirement_id,
             "element_name": group["element_name"],
             "discrepancy_type": group["discrepancy_type"],
             "description": group["description"],

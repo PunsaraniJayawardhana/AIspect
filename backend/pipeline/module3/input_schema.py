@@ -1,7 +1,18 @@
+"""Module 3 AC normalization and discrepancy adaptation.
+
+Canonical AC numbering rule:
+AC IDs are assigned once from the full enriched AC list (explicit + implicit,
+static + dynamic) in original Module 1 order, starting at AC-01. Module 3
+trusts incoming canonical requirement_id values from Module 2. SequenceMatcher
+fallback is used only when the incoming ID is missing.
+"""
+
+import logging
 import re
 from difflib import SequenceMatcher
 
 MATCH_THRESHOLD = 0.45
+logger = logging.getLogger(__name__)
 
 # Module 2's discrepancy_type values are space-separated Title Case
 # (see confidence_index.SEVERITY_MAP). Normalize any underscored variants
@@ -61,7 +72,22 @@ def adapt_discrepancy(discrepancy, normalized_acs):
     need: real requirement_id, real ac_text, canonical discrepancy_type.
     All original fields (ci, confidence_label, element_name, severity, ...) pass through."""
     violated = discrepancy.get("violated_criterion", "")
-    ac_id, ac_text, match_score = resolve_requirement_id(violated, normalized_acs)
+    incoming_ac_id = discrepancy.get("requirement_id") or discrepancy.get("ac_id")
+    ac_text = violated
+    match_score = 0.0
+
+    if incoming_ac_id:
+        ac_id = incoming_ac_id
+        matched = next((ac for ac in normalized_acs if ac.get("ac_id") == incoming_ac_id), None)
+        if matched:
+            ac_text = matched.get("text") or violated
+            match_score = 1.0
+    else:
+        logger.warning(
+            "Missing canonical requirement_id for discrepancy '%s'; falling back to SequenceMatcher",
+            discrepancy.get("discrepancy_id") or discrepancy.get("element_name") or "unknown",
+        )
+        ac_id, ac_text, match_score = resolve_requirement_id(violated, normalized_acs)
 
     adapted = dict(discrepancy)
     adapted["requirement_id"] = ac_id  # None if no confident match — see note below
