@@ -13,7 +13,7 @@ DISCREPANCY_TYPES = [
 # Not assigned manually - determined by type alone
 SEVERITY_MAP = {
     "Missing Element": "HIGH",
-    "Wrong Label": "MEDIUM",
+    "Wrong Label": "LOW",
     "Business Rule Violation": "HIGH",
     "Layout Constraint Mismatch": "LOW",
     "Interaction Flow Error": "HIGH"
