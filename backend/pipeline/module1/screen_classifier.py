@@ -12,8 +12,8 @@ the expected-UI-elements taxonomy. Classifier output must be predictable.
 """
 
 from typing import Dict, Any
-from integrations.claude_client import call_claude_json
-from config.settings import MODULE1_MODEL
+from backend.integrations.claude_client import call_claude_json
+from backend.config.settings import MODULE1_MODEL
 
 
 SCREEN_TYPES = [

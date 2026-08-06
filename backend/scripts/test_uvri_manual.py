@@ -10,8 +10,8 @@ Run with:
 """
 
 import asyncio
-from pipeline.module1.uvri import compute_uvri
-from pipeline.module1.ambiguity_penalty import compute_ambiguity_penalty
+from backend.pipeline.module1.uvri import compute_uvri
+from backend.pipeline.module1.ambiguity_penalty import compute_ambiguity_penalty
 
 
 # ── Case 1: LOGIN screen ────────────────────────────────────────────────

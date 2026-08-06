@@ -25,4 +25,5 @@ frontend/dist/
 
 # Cypress (for later)
 cypress/screenshots/
-cypress/videos/
+cypress/videos/backend/.venv/
+output/

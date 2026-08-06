@@ -2,26 +2,28 @@ import json
 import os
 import pathlib
 import httpx
-from jobs.job_store import Job
-from integrations.jira_client import (
+import logging
+import inspect
+from backend.jobs.job_store import Job
+from backend.integrations.jira_client import (
     fetch_single_story,
     fetch_attachment_as_base64,
     create_bug_ticket,
 )
 
-from pipeline.module1.adf_parser import parse_adf
-from pipeline.module1.screen_classifier import classify_screen_type
-from pipeline.module1.uvri import compute_uvri
-from pipeline.module1.inference import infer_implicit_elements
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
-from pipeline.module3.test_generator import generate_dual_mode_tests
-from pipeline.module3.cypress_runner import execute_cypress
+from backend.pipeline.module1.adf_parser import parse_adf
+from backend.pipeline.module1.screen_classifier import classify_screen_type
+from backend.pipeline.module1.uvri import compute_uvri
+from backend.pipeline.module1.inference import infer_implicit_elements
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
+from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
+from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
 
 
 RESULTS_DIR        = pathlib.Path("output/results")
 MODULE2_OUTPUT_DIR = pathlib.Path("output/module2_output")
-MODULE1_FIXTURES_DIR = pathlib.Path("output/module1_fixtures")
 
 # Keywords that indicate dynamic/conditional behaviour
 # ACs containing these cannot be validated from a static design image
@@ -97,38 +99,7 @@ def _persist_module2_output(story_key: str, result: dict) -> None:
     )
 
 
-def _persist_module1_fixture(story_key: str, data: dict) -> None:
-    """
-    Save Module 1 output as a fixture file.
-    On subsequent runs Module 2 loads this instead of re-running Module 1.
-    Saves Jira API calls and Claude inference API credits.
-    """
-    MODULE1_FIXTURES_DIR.mkdir(parents=True, exist_ok=True)
-    (MODULE1_FIXTURES_DIR / f"{story_key}.json").write_text(
-        json.dumps(data, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    print(f"[Module1] Fixture saved to "
-          f"output/module1_fixtures/{story_key}.json")
-
-
-def _load_module1_fixture(story_key: str) -> dict:
-    """
-    Load Module 1 fixture if it exists.
-    Returns the fixture dict or None if not found.
-    """
-    fixture_path = MODULE1_FIXTURES_DIR / f"{story_key}.json"
-    if fixture_path.exists():
-        print(f"[Module1] Fixture found — loading from "
-              f"output/module1_fixtures/{story_key}.json")
-        with open(fixture_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    print(f"[Module1] No fixture found for {story_key} "
-          f"— running full Module 1")
-    return None
-
-
-async def process_one_story(job: Job, story_key: str, app_url: str = None):
+async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_path_override: str = ""):
     try:
         job.status = "running"
 
@@ -136,138 +107,86 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         n_passes = int(os.environ.get("MODULE2_PASSES", 5))
         print(f"[Module2] N passes set to: {n_passes}")
 
-        # ── Check for existing Module 1 fixture ─────────────────────
-        fixture = _load_module1_fixture(story_key)
+        # ── 1. Fetch the ticket ──────────────────────────────────
+        await emit(job, "fetching_ticket")
+        story = await fetch_single_story(story_key)
 
-        if fixture:
-            # ── Load from fixture — skip Module 1 entirely ──────────
-            print(f"[Module1] Skipping Jira fetch, ADF parse, "
-                  f"image download, implicit inference")
-            screen_type       = fixture["screen_type"]
-            uvri_pre          = fixture["uvri_pre"]
-            uvri_post         = fixture["uvri_post"]
-            sub_pre           = fixture["subterms_pre"]
-            sub_post          = fixture["subterms_post"]
-            explicit_ACs      = fixture["explicit_ACs"]
-            implicit_ACs      = fixture["implicit_ACs"]
-            enriched_ACs      = fixture["enriched_ACs"]
-            static_ACs        = fixture["static_ACs"]
-            dynamic_ACs       = fixture["dynamic_ACs"]
-            design_images_b64 = fixture["design_images_b64"]
+        # Skip tickets with no description
+        if story["description_adf"] is None:
+            skip_record = {
+                "story_key":      story_key,
+                "story_summary":  story.get("summary", ""),
+                "status_at_skip": story.get("status"),
+                "skipped":        True,
+                "reason":         "null description",
+            }
+            _persist_result(story_key, skip_record)
+            job.status = "completed"
+            job.result = skip_record
+            await emit(job, "done", job.result)
+            return
 
-            print(f"[Module1] Loaded from fixture: "
-                  f"screen_type={screen_type}, "
-                  f"static_ACs={len(static_ACs)}, "
-                  f"dynamic_ACs={len(dynamic_ACs)}, "
-                  f"images={len(design_images_b64)}")
+        # ── 2. Parse the ADF tree ────────────────────────────────
+        await emit(job, "parsing_adf")
+        parsed = parse_adf(story["description_adf"])
+        story_text = parsed.get("story_text", "")
+        nav_path = parsed.get("nav_path", "")
+        if nav_path_override:
+            nav_path = nav_path_override
 
-            await emit(job, "module1_loaded_from_fixture", {
-                "screen_type":   screen_type,
-                "static_count":  len(static_ACs),
-                "dynamic_count": len(dynamic_ACs),
-            })
+        # ── 3. Download design images ────────────────────────────
+        image_attachments = [
+            a for a in story["attachments"]
+            if a.get("mime_type", "").startswith("image/")
+        ]
+        await emit(job, "downloading_design_images", {"count": len(image_attachments)})
+        design_images_b64 = []
+        for attachment in image_attachments:
+            img = await fetch_attachment_as_base64(attachment["content_url"])
+            design_images_b64.append(img)
 
-        else:
-            # ── Run full Module 1 ────────────────────────────────────
+        # ── 4. Module 1 — Screen classification ──────────────────
+        await emit(job, "classifying_screen_type")
+        screen_type = await classify_screen_type(parsed)
+        await emit(job, "screen_type_classified", {"screen_type": screen_type})
 
-            # ── 1. Fetch the ticket ──────────────────────────────────
-            await emit(job, "fetching_ticket")
-            story = await fetch_single_story(story_key)
+        # ── 5. Module 1 — UVRI pre-enrichment ────────────────────
+        await emit(job, "computing_uvri_pre")
+        uvri_pre, sub_pre = await compute_uvri(parsed["explicit_ACs"], screen_type)
+        await emit(job, "uvri_pre_done", {"uvri": uvri_pre, "subterms": sub_pre})
 
-            # Skip tickets with no description
-            if story["description_adf"] is None:
-                skip_record = {
-                    "story_key":      story_key,
-                    "story_summary":  story.get("summary", ""),
-                    "status_at_skip": story.get("status"),
-                    "skipped":        True,
-                    "reason":         "null description",
-                }
-                _persist_result(story_key, skip_record)
-                job.status = "completed"
-                job.result = skip_record
-                await emit(job, "done", job.result)
-                return
+        # ── 6. Module 1 — Implicit inference ─────────────────────
+        await emit(job, "running_implicit_inference")
+        implicit_ACs = await infer_implicit_elements(parsed, screen_type)
+        await emit(job, "inference_done", {"implicit_ACs": implicit_ACs})
 
-            # ── 2. Parse the ADF tree ────────────────────────────────
-            await emit(job, "parsing_adf")
-            parsed = parse_adf(story["description_adf"])
+        explicit_ACs = parsed["explicit_ACs"]
+        enriched_ACs = explicit_ACs + implicit_ACs
+        canonical_acs = [
+            {
+                "ac_id": f"AC-{idx:02d}",
+                "text": ac,
+                "type": "explicit" if idx <= len(explicit_ACs) else "implicit",
+            }
+            for idx, ac in enumerate(enriched_ACs, start=1)
+        ]
 
-            # ── 3. Download design images ────────────────────────────
-            image_attachments = [
-                a for a in story["attachments"]
-                if a.get("mime_type", "").startswith("image/")
-            ]
-            await emit(job, "downloading_design_images",
-                       {"count": len(image_attachments)})
-            design_images_b64 = []
-            for attachment in image_attachments:
-                img = await fetch_attachment_as_base64(
-                    attachment["content_url"]
-                )
-                design_images_b64.append(img)
+        # ── 7. Module 1 — UVRI post-enrichment ───────────────────
+        await emit(job, "computing_uvri_post")
+        uvri_post, sub_post = await compute_uvri(enriched_ACs, screen_type)
+        await emit(job, "uvri_post_done", {
+            "uvri":     uvri_post,
+            "subterms": sub_post,
+            "delta":    uvri_post - uvri_pre,
+        })
 
-            # ── 4. Module 1 — Screen classification ──────────────────
-            await emit(job, "classifying_screen_type")
-            screen_type = await classify_screen_type(parsed)
-            await emit(job, "screen_type_classified",
-                       {"screen_type": screen_type})
-
-            # ── 5. Module 1 — UVRI pre-enrichment ────────────────────
-            await emit(job, "computing_uvri_pre")
-            uvri_pre, sub_pre = await compute_uvri(
-                parsed["explicit_ACs"], screen_type
-            )
-            await emit(job, "uvri_pre_done",
-                       {"uvri": uvri_pre, "subterms": sub_pre})
-
-            # ── 6. Module 1 — Implicit inference ─────────────────────
-            await emit(job, "running_implicit_inference")
-            implicit_ACs = await infer_implicit_elements(
-                parsed, screen_type
-            )
-            await emit(job, "inference_done",
-                       {"implicit_ACs": implicit_ACs})
-
-            explicit_ACs = parsed["explicit_ACs"]
-            enriched_ACs = explicit_ACs + implicit_ACs
-
-            # ── 7. Module 1 — UVRI post-enrichment ───────────────────
-            await emit(job, "computing_uvri_post")
-            uvri_post, sub_post = await compute_uvri(
-                enriched_ACs, screen_type
-            )
-            await emit(job, "uvri_post_done", {
-                "uvri":     uvri_post,
-                "subterms": sub_post,
-                "delta":    uvri_post - uvri_pre,
-            })
-
-            # ── 7.5 — AC Pre-Classification ───────────────────────────
-            await emit(job, "classifying_acs")
-            static_ACs, dynamic_ACs = classify_acs(enriched_ACs)
-            await emit(job, "acs_classified", {
-                "static_count":  len(static_ACs),
-                "dynamic_count": len(dynamic_ACs),
-            })
-
-            # ── Save Module 1 fixture for future runs ─────────────────
-            # Next time this ticket is processed, Module 1 is skipped
-            # and this fixture is loaded directly — saving API credits
-            _persist_module1_fixture(story_key, {
-                "ticket_id":          story_key,
-                "screen_type":        screen_type,
-                "uvri_pre":           uvri_pre,
-                "uvri_post":          uvri_post,
-                "subterms_pre":       sub_pre,
-                "subterms_post":      sub_post,
-                "explicit_ACs":       explicit_ACs,
-                "implicit_ACs":       implicit_ACs,
-                "enriched_ACs":       enriched_ACs,
-                "static_ACs":         static_ACs,
-                "dynamic_ACs":        dynamic_ACs,
-                "design_images_b64":  design_images_b64,
-            })
+        # ── 7.5 — AC Pre-Classification ──────────────────────────
+        await emit(job, "classifying_acs")
+        static_ACs, dynamic_ACs = classify_acs(enriched_ACs)
+        await emit(job, "acs_classified", {
+            "static_count":  len(static_ACs),
+            "dynamic_count": len(dynamic_ACs),
+        })
 
         # ── 8. Module 2 — Multi-pass validation ─────────────────────
         # Only static ACs are sent to Module 2
@@ -280,7 +199,11 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         )
         await emit(job, "module2_passes_complete")
 
-        verified = compute_confidence_index(passes, n_passes=n_passes)
+        verified = compute_confidence_index(
+            passes,
+            n_passes=n_passes,
+            canonical_acs=canonical_acs,
+        )
 
         # Split by confidence level
         high_confidence = [
@@ -323,40 +246,113 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
 
         # ── 9. Module 3 — Test generation ───────────────────────────
         await emit(job, "generating_tests")
-        tests = await generate_dual_mode_tests(
-            enriched_ACs,
-            high_confidence
+        tests = generate_dual_mode_tests(
+            verified,
+            explicit_ACs,
+            implicit_ACs,
+            story_text,
+            story_key,
+            screen_type=screen_type,
+            app_url=app_url,
+            nav_path=nav_path,
         )
+
+        docx_path = export_to_docx(tests, story_key, f"output/module3/{story_key}_test_cases.docx")
+        markdown_path = export_to_markdown(tests, story_key, f"output/module3/{story_key}_test_cases.md")
         await emit(job, "tests_generated", {"test_count": len(tests)})
 
         # ── 10. Module 3 — Cypress execution ────────────────────────
         cypress_results = []
-        if app_url:
-            await emit(job, "running_cypress")
-            cypress_results = await execute_cypress(tests, app_url)
-            await emit(job, "cypress_done", {"results": cypress_results})
-
-        # ── 11. Module 3 — Bug ticket creation ──────────────────────
         bugs_created = []
-        for result in cypress_results:
-            if result.get("mode") == "defect" and \
-               result.get("passed") is False:
-                await emit(job, "creating_bug_ticket",
-                           {"discrepancy": result["discrepancy"]["element"]})
-                bug = await create_bug_ticket(
-                    summary=(
-                        f"[AIspect] {result['discrepancy']['element']}"
-                    ),
-                    description=result["discrepancy"]["description"],
-                    parent_story_key=story_key,
-                    severity=result["discrepancy"]["severity"],
-                )
-                bugs_created.append(bug["key"])
+        if app_url:
+            defect_only_mode = str(os.environ.get("MODULE3_DEFECT_ONLY", "")).strip().lower() in {"1", "true", "yes", "on"}
+            await emit(job, "running_cypress", {
+                "execution_mode": "defect_only" if defect_only_mode else "ticket_level",
+                "execution_mode_source": "MODULE3_DEFECT_ONLY" if defect_only_mode else "default",
+                "test_breakdown": {
+                    "defect_first": {
+                        "generated": sum(1 for test in tests if test.get("mode") == "defect_first"),
+                    },
+                    "coverage_first": {
+                        "generated": sum(1 for test in tests if test.get("mode") == "coverage_first"),
+                    },
+                }
+            })
+            cypress_results = await execute_cypress(tests, app_url, defects_only=defect_only_mode)
+            await emit(job, "cypress_done", {
+                "results": cypress_results,
+                "execution_mode": "defect_only" if defect_only_mode else "ticket_level",
+                "execution_mode_source": "MODULE3_DEFECT_ONLY" if defect_only_mode else "default",
+                "test_breakdown": {
+                    "defect_first": {
+                        "executed": sum(1 for result in cypress_results if result.get("mode") == "defect_first"),
+                        "passed": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("passed") is True),
+                        "failed": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("confirmed_fault") is True),
+                        "skipped": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("passed") is None),
+                    },
+                    "coverage_first": {
+                        "executed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first"),
+                        "passed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("passed") is True),
+                        "failed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("confirmed_fault") is True),
+                        "skipped": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("passed") is None),
+                    },
+                },
+            })
 
-        # ── 12. Final result ─────────────────────────────────────────
+            cypress_object_ids = {id(item) for item in cypress_results}
+
+            def _matches_record(record: dict, discrepancy_id: str, tc_id: str) -> bool:
+                if discrepancy_id and record.get("discrepancy_id") == discrepancy_id:
+                    return True
+                if tc_id and record.get("tc_id") == tc_id:
+                    return True
+                return False
+
+            def _set_ticket(records, ticket_key: str, discrepancy_id: str, tc_id: str, skip_shared: bool = False):
+                for record in records or []:
+                    if skip_shared and id(record) in cypress_object_ids:
+                        continue
+                    if _matches_record(record, discrepancy_id, tc_id):
+                        record["jira_ticket"] = ticket_key
+
+            for result in get_confirmed_faults(cypress_results):
+                await emit(job, "creating_bug_ticket", {"discrepancy": result.get("discrepancy_id")})
+                bug = await create_bug_ticket(
+                    summary=f"[AIspect] {result.get('scenario', result.get('discrepancy_id'))}",
+                    description=(
+                        f"{result.get('expected_result', '')} | "
+                        f"{result.get('scenario', '')}"
+                    ).strip(" |"),
+                    parent_story_key=story_key,
+                    severity=result.get("priority", "Medium"),
+                )
+                bugs_created.append(
+                    {
+                        "ticket_key": bug["key"],
+                        "discrepancy_id": result.get("discrepancy_id"),
+                    }
+                )
+
+                ticket_key = bug["key"]
+                discrepancy_id = result.get("discrepancy_id")
+                tc_id = result.get("tc_id")
+
+                _set_ticket(tests, ticket_key, discrepancy_id, tc_id)
+                _set_ticket(cypress_results, ticket_key, discrepancy_id, tc_id, skip_shared=True)
+
+        await emit(job, "module3_done", {"bugs_created": len(bugs_created)})
+
+        # ── 11. Final result ────────────────────────────────────────
+        defect_tests = [test for test in tests if test.get("mode") == "defect_first"]
+        coverage_tests = [test for test in tests if test.get("mode") == "coverage_first"]
+        defect_results = [result for result in cypress_results if result.get("mode") == "defect_first"]
+        coverage_results = [result for result in cypress_results if result.get("mode") == "coverage_first"]
+
         job.result = {
             "story_key":   story_key,
             "screen_type": screen_type,
+            "app_url": app_url,
+            "nav_path": nav_path,
             "uvri_pre":    uvri_pre,
             "uvri_post":   uvri_post,
             "delta":       uvri_post - uvri_pre,
@@ -371,8 +367,28 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             "medium_confidence_discrepancies": medium_confidence,
             "low_confidence_discrepancies":    low_confidence,
             "tests":           tests,
+            "test_breakdown": {
+                "defect_first": {
+                    "generated": len(defect_tests),
+                    "executed": len(defect_results),
+                    "passed": sum(1 for item in defect_results if item.get("passed") is True),
+                    "failed": sum(1 for item in defect_results if item.get("confirmed_fault") is True),
+                    "skipped": sum(1 for item in defect_results if item.get("passed") is None),
+                },
+                "coverage_first": {
+                    "generated": len(coverage_tests),
+                    "executed": len(coverage_results),
+                    "passed": sum(1 for item in coverage_results if item.get("passed") is True),
+                    "failed": sum(1 for item in coverage_results if item.get("confirmed_fault") is True),
+                    "skipped": sum(1 for item in coverage_results if item.get("passed") is None),
+                },
+            },
             "cypress_results": cypress_results,
             "bugs_created":    bugs_created,
+            "exports": {
+                "docx": docx_path,
+                "markdown": markdown_path,
+            },
         }
         _persist_result(story_key, job.result)
         job.status = "completed"

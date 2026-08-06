@@ -1,34 +1,61 @@
 """
-Dual-Mode Validation Script
-Runs implicit ACs alone at N=1, and enriched ACs (explicit + implicit
-combined) at N=5
-Produces separate output files for teammate analysis
-Does NOT affect the main pipeline or Module 2 output
+Dual-mode Module 2 validation runner.
+
+Runs explicit static ACs with N=5 and implicit static ACs with N=1 using
+live Jira story data (no fixtures).
+
+Usage:
+    python -m backend.scripts.test_dual_mode_validation EXC-1
 """
 
+import asyncio
 import json
-import os
-import sys
 import pathlib
+import sys
+
 from dotenv import load_dotenv
 
-# Load environment variables
+from backend.integrations.jira_client import fetch_attachment_as_base64, fetch_single_story
+from backend.pipeline.module1.adf_parser import parse_adf
+from backend.pipeline.module1.inference import infer_implicit_elements
+from backend.pipeline.module1.screen_classifier import classify_screen_type
+from backend.pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.orchestrator import classify_acs
+
 load_dotenv()
 
-# Add backend to path
-sys.path.insert(0, str(pathlib.Path(__file__).parent.parent))
+N_EXPLICIT = 5
+N_IMPLICIT = 1
+OUTPUT_DIR = pathlib.Path("output/dual_mode_results")
+OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
 
-# ─── Configuration ───────────────────────────────────────────────────
+async def _load_story_inputs(story_key: str) -> dict:
+    story = await fetch_single_story(story_key)
+    if story.get("description_adf") is None:
+        raise ValueError(f"Story {story_key} has no description ADF payload")
 
 TICKET_ID = "EXC-1"  # change this to any ticket
 N_IMPLICIT = 1       # passes for implicit ACs
 N_ENRICHED = 5       # passes for the enriched (explicit + implicit) AC set
 
-OUTPUT_DIR = pathlib.Path("output/dual_mode_results")
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    image_attachments = [
+        attachment for attachment in story.get("attachments", [])
+        if attachment.get("mime_type", "").startswith("image/")
+    ]
+    design_images_b64 = []
+    for attachment in image_attachments:
+        design_images_b64.append(await fetch_attachment_as_base64(attachment["content_url"]))
+
+    return {
+        "screen_type": screen_type,
+        "explicit_ACs": explicit_acs,
+        "implicit_ACs": implicit_acs,
+        "static_ACs": static_acs,
+        "design_images_b64": design_images_b64,
+    }
+
 
 
 def load_module1_fixture(ticket_id: str) -> dict:
@@ -71,7 +98,6 @@ async def run_dual_mode(ticket_id: str):
     implicit_static = [
         ac for ac in static_ACs
         if ac in implicit_ACs
-    ]
 
     # Enriched = explicit + implicit static ACs merged into one set (deduped,
     # order preserved) so they get validated together as a single pass-set.
@@ -83,10 +109,11 @@ async def run_dual_mode(ticket_id: str):
     print(f"Implicit static ACs: {len(implicit_static)} → N={N_IMPLICIT}")
     print(f"Enriched static ACs (explicit+implicit): {len(enriched_static)} → N={N_ENRICHED}")
 
-    # ── Run N=1 on implicit ACs ──────────────────────────────────────
+
     implicit_passes = []
     if implicit_static:
         print(f"\n[Implicit] Running {N_IMPLICIT} pass...")
+
         implicit_passes = await run_multipass_validation(
             implicit_static,
             design_images_b64,
@@ -126,7 +153,7 @@ async def run_dual_mode(ticket_id: str):
         print(f"  [{d['confidence_label']}] CI={d['confidence_index']} "
               f"— {d['element_name']}")
 
-    # ── Save output ──────────────────────────────────────────────────
+# ── Save output ──────────────────────────────────────────────────
     output = {
         "ticket_id":   ticket_id,
         "screen_type": fixture["screen_type"],

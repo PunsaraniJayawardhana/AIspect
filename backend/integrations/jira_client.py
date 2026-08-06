@@ -1,9 +1,13 @@
 import httpx
 import base64
+import json
+import logging
 from typing import List, Optional
-from config.settings import (
+from backend.config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
+
+logger = logging.getLogger(__name__)
 
 _AUTH_TOKEN = base64.b64encode(
     f"{JIRA_EMAIL}:{JIRA_API_TOKEN}".encode()
@@ -12,6 +16,14 @@ _HEADERS = {
     "Accept": "application/json",
     "Authorization": f"Basic {_AUTH_TOKEN}",
 }
+
+
+def _response_json_utf8(response: httpx.Response) -> dict:
+    """Decode JSON with an explicit UTF-8 fallback to avoid mojibake."""
+    try:
+        return response.json()
+    except ValueError:
+        return json.loads(response.content.decode("utf-8", errors="replace"))
 
 
 async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
@@ -29,19 +41,22 @@ async def fetch_story_keys(project_key: Optional[str] = None) -> List[str]:
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(url, headers=_HEADERS, params=params)
         response.raise_for_status()
-        return [issue["key"] for issue in response.json().get("issues", [])]
+        payload = _response_json_utf8(response)
+        return [issue["key"] for issue in payload.get("issues", [])]
 
 
 async def fetch_single_story(story_key: str) -> dict:
     """Fetch ONE story's full content by key. Works for any project — the
-    key itself (e.g. 'EXC-1', 'PROJ-42') already identifies the project."""
+    key itself (e.g. 'EXC-1', 'PROJ-42') already identifies the project.
+    """
     url = f"{JIRA_BASE_URL}/rest/api/3/issue/{story_key}"
     params = {"fields": "summary,description,priority,status,attachment"}
 
+    logger.info("Fetching story from Jira API: %s", story_key)
     async with httpx.AsyncClient(timeout=30.0) as client:
         response = await client.get(url, headers=_HEADERS, params=params)
         response.raise_for_status()
-        issue = response.json()
+        issue = _response_json_utf8(response)
 
     attachments = []
     for att in issue["fields"].get("attachment", []) or []:
@@ -131,4 +146,4 @@ async def create_bug_ticket(
             json=payload,
         )
         response.raise_for_status()
-        return response.json()
+        return _response_json_utf8(response)

@@ -5,15 +5,14 @@ Both teams must update this file before changing field names or types.
 
 ## How to generate real examples
 
-Fixtures are not committed to git (they contain large base64 images). 
-Generate them locally:
+Generate a live Module 2 snapshot locally:
 
 ```powershell
-python -m backend.scripts.export_module2_fixture EXC-1
-python -m backend.scripts.export_module2_fixture EXC-7
+python -m backend.scripts.export_module2_snapshot EXC-1
+python -m backend.scripts.export_module2_snapshot EXC-7
 ```
 
-This writes to `backend/output/module2_fixtures/{STORY_KEY}.json`.
+This writes to `output/module2_output/{STORY_KEY}.json`.
 
 You need a configured `.env` with Jira credentials and the AIspect 
 backend running (the script re-fetches from Jira to populate story_text, 
@@ -39,7 +38,7 @@ nav_path, and design images).
 
 ## Encoding
 
-All string fields are UTF-8. Open fixture files in Python with:
+All string fields are UTF-8. Open output files in Python with:
 \`\`\`python
 import json
 with open(path, encoding="utf-8") as f:
