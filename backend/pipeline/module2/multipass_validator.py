@@ -3,19 +3,97 @@ import os
 import base64
 import io
 import anthropic
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from .validation_prompts import SYSTEM_PROMPT, VALIDATION_PROMPT_VARIANTS
 
 TEMPERATURE_SCHEDULE = [0.0, 0.3, 0.5, 0.7, 1.0]
 
-# Claude API maximum image dimension
-MAX_IMAGE_DIMENSION = 7900  # slightly below 8000 to be safe
+
+MAX_IMAGE_DIMENSION = 7900
+
+MAX_ASPECT_RATIO = 1.0
+BAND_OVERLAP_PX = 150
+
+
+# --- NEW ---
+def _split_tall_image(img: "Image.Image", max_aspect_ratio: float = MAX_ASPECT_RATIO,
+                       overlap_px: int = BAND_OVERLAP_PX) -> List[Tuple["Image.Image", int, int]]:
+    """
+    Splits an unusually tall image into shorter, slightly overlapping bands
+    so each band keeps a normal aspect ratio and survives the multimodal
+    API's own internal downsampling with legible text.
+
+    Returns a list of (band_image, y_start, y_end) tuples.
+    A normal-aspect-ratio image returns a single-item list unchanged.
+    """
+    w, h = img.size
+    if h / w <= max_aspect_ratio:
+        return [(img, 0, h)]
+
+    band_height = int(w * max_aspect_ratio)
+    bands = []
+    y = 0
+    while y < h:
+        bottom = min(y + band_height, h)
+        band = img.crop((0, y, w, bottom))
+        bands.append((band, y, bottom))
+        if bottom == h:
+            break
+        y += band_height - overlap_px
+    return bands
+
+
+# --- NEW ---
+def _prepare_design_images(design_images_b64: List[str]) -> List[str]:
+    """
+    Runs BEFORE the per-pass resize step. Decodes each design image, splits
+    any image with an extreme aspect ratio into legible bands, and re-encodes
+    everything back to base64. A normal single-section screenshot passes
+    through untouched as a single image.
+
+    This must run once, ahead of the pass loop, so all 5 passes see the
+    exact same set of images (splitting is deterministic and independent
+    of temperature/prompt variant).
+    """
+    from PIL import Image
+
+    prepared: List[str] = []
+    split_log = []
+
+    for idx, img_b64 in enumerate(design_images_b64):
+        img_bytes = base64.b64decode(img_b64)
+        img = Image.open(io.BytesIO(img_bytes))
+        w, h = img.size
+        fmt = img.format if img.format else "PNG"
+
+        bands = _split_tall_image(img)
+
+        split_log.append({
+            "source_index": idx,
+            "original_dimensions": [w, h],
+            "aspect_ratio": round(h / w, 2),
+            "was_split": len(bands) > 1,
+            "band_count": len(bands),
+        })
+
+        for band_img, y_start, y_end in bands:
+            buffer = io.BytesIO()
+            band_img.save(buffer, format=fmt)
+            buffer.seek(0)
+            prepared.append(base64.b64encode(buffer.read()).decode())
+
+    print(f"[Module2] Image preparation summary: {json.dumps(split_log)}")
+    return prepared
 
 
 def _resize_image_if_needed(img_b64: str) -> str:
     """
     Resize image if either dimension exceeds Claude's 8000px limit.
     Returns original base64 if within limits, resized base64 otherwise.
+
+    NOTE: this still runs after _prepare_design_images, as a safety net —
+    but with splitting now handled upstream, individual bands should
+    rarely need this except for oversized single-section screenshots.
     """
     try:
         from PIL import Image
@@ -93,7 +171,7 @@ def run_single_pass(
 
     content = []
     for img_b64 in design_images:
-        # Resize if needed before sending to Claude
+        # Safety-net resize (bands are already split/prepared upstream)
         img_b64 = _resize_image_if_needed(img_b64)
         media_type = _detect_media_type(img_b64)
         print(f"[Module2] Detected image format: {media_type}")
@@ -138,6 +216,10 @@ async def run_multipass_validation(
     model = os.environ.get("MODULE2_MODEL", "claude-sonnet-4-6")
     client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
+    # --- NEW: split any extreme-aspect-ratio full-page captures ONCE,
+    # before the pass loop, so all 5 passes see identical, legible images. ---
+    prepared_images = _prepare_design_images(design_images_b64)
+
     all_pass_results = []
     for i in range(n):
         variant_idx = i % len(VALIDATION_PROMPT_VARIANTS)
@@ -146,7 +228,7 @@ async def run_multipass_validation(
               f"temp={TEMPERATURE_SCHEDULE[variant_idx]})")
 
         result = run_single_pass(
-            client, enriched_ACs, design_images_b64, variant_idx, model
+            client, enriched_ACs, prepared_images, variant_idx, model
         )
         print(f"[Module2] Pass {i + 1} found "
               f"{len(result)} discrepancy candidate(s)")

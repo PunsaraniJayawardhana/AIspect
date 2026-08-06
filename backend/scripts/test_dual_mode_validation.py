@@ -1,6 +1,7 @@
 """
 Dual-Mode Validation Script
-Runs explicit ACs at N=5 and implicit ACs at N=1
+Runs implicit ACs alone at N=1, and enriched ACs (explicit + implicit
+combined) at N=5
 Produces separate output files for teammate analysis
 Does NOT affect the main pipeline or Module 2 output
 """
@@ -23,8 +24,8 @@ from pipeline.module2.confidence_index import compute_confidence_index
 # ─── Configuration ───────────────────────────────────────────────────
 
 TICKET_ID = "EXC-1"  # change this to any ticket
-N_EXPLICIT = 5       # passes for explicit ACs
 N_IMPLICIT = 1       # passes for implicit ACs
+N_ENRICHED = 5       # passes for the enriched (explicit + implicit) AC set
 
 OUTPUT_DIR = pathlib.Path("output/dual_mode_results")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -47,8 +48,8 @@ def load_module1_fixture(ticket_id: str) -> dict:
 async def run_dual_mode(ticket_id: str):
     """
     Run dual-mode validation:
-    - Explicit ACs: N=5 passes
-    - Implicit ACs: N=1 pass
+    - Implicit ACs alone: N=1 pass
+    - Enriched ACs (explicit + implicit combined): N=5 passes
     """
     print(f"\n{'='*60}")
     print(f"DUAL MODE VALIDATION — {ticket_id}")
@@ -72,18 +73,15 @@ async def run_dual_mode(ticket_id: str):
         if ac in implicit_ACs
     ]
 
-    print(f"\nExplicit static ACs: {len(explicit_static)} → N={N_EXPLICIT}")
-    print(f"Implicit static ACs: {len(implicit_static)} → N={N_IMPLICIT}")
+    # Enriched = explicit + implicit static ACs merged into one set (deduped,
+    # order preserved) so they get validated together as a single pass-set.
+    enriched_static = list(explicit_static)
+    for ac in implicit_static:
+        if ac not in enriched_static:
+            enriched_static.append(ac)
 
-    # ── Run N=5 on explicit ACs ──────────────────────────────────────
-    explicit_passes = []
-    if explicit_static:
-        print(f"\n[Explicit] Running {N_EXPLICIT} passes...")
-        explicit_passes = await run_multipass_validation(
-            explicit_static,
-            design_images_b64,
-            n=N_EXPLICIT
-        )
+    print(f"Implicit static ACs: {len(implicit_static)} → N={N_IMPLICIT}")
+    print(f"Enriched static ACs (explicit+implicit): {len(enriched_static)} → N={N_ENRICHED}")
 
     # ── Run N=1 on implicit ACs ──────────────────────────────────────
     implicit_passes = []
@@ -95,26 +93,36 @@ async def run_dual_mode(ticket_id: str):
             n=N_IMPLICIT
         )
 
-    # ── Compute CI separately ────────────────────────────────────────
-    verified_explicit = compute_confidence_index(
-        explicit_passes, n_passes=N_EXPLICIT
-    ) if explicit_passes else []
+    # ── Run N=5 on enriched (explicit + implicit combined) ACs ───────
+    enriched_passes = []
+    if enriched_static:
+        print(f"\n[Enriched] Running {N_ENRICHED} passes...")
+        enriched_passes = await run_multipass_validation(
+            enriched_static,
+            design_images_b64,
+            n=N_ENRICHED
+        )
 
+    # ── Compute CI separately ────────────────────────────────────────
     verified_implicit = compute_confidence_index(
         implicit_passes, n_passes=N_IMPLICIT
     ) if implicit_passes else []
+
+    verified_enriched = compute_confidence_index(
+        enriched_passes, n_passes=N_ENRICHED
+    ) if enriched_passes else []
 
     # ── Print results ────────────────────────────────────────────────
     print(f"\n{'─'*60}")
     print(f"RESULTS — {ticket_id}")
     print(f"{'─'*60}")
-    print(f"Explicit findings: {len(verified_explicit)}")
-    for d in verified_explicit:
+    print(f"Implicit findings: {len(verified_implicit)}")
+    for d in verified_implicit:
         print(f"  [{d['confidence_label']}] CI={d['confidence_index']} "
               f"— {d['element_name']}")
 
-    print(f"\nImplicit findings: {len(verified_implicit)}")
-    for d in verified_implicit:
+    print(f"\nEnriched (explicit+implicit) findings: {len(verified_enriched)}")
+    for d in verified_enriched:
         print(f"  [{d['confidence_label']}] CI={d['confidence_index']} "
               f"— {d['element_name']}")
 
@@ -122,19 +130,6 @@ async def run_dual_mode(ticket_id: str):
     output = {
         "ticket_id":   ticket_id,
         "screen_type": fixture["screen_type"],
-        "explicit_validation": {
-            "n_passes":      N_EXPLICIT,
-            "ac_count":      len(explicit_static),
-            "discrepancies": verified_explicit,
-            "summary": {
-                "high":   len([d for d in verified_explicit
-                               if d["confidence_label"] == "HIGH"]),
-                "medium": len([d for d in verified_explicit
-                               if d["confidence_label"] == "MEDIUM"]),
-                "low":    len([d for d in verified_explicit
-                               if d["confidence_label"] == "LOW"]),
-            }
-        },
         "implicit_validation": {
             "n_passes":      N_IMPLICIT,
             "ac_count":      len(implicit_static),
@@ -145,6 +140,19 @@ async def run_dual_mode(ticket_id: str):
                 "medium": len([d for d in verified_implicit
                                if d["confidence_label"] == "MEDIUM"]),
                 "low":    len([d for d in verified_implicit
+                               if d["confidence_label"] == "LOW"]),
+            }
+        },
+        "enriched_validation": {
+            "n_passes":      N_ENRICHED,
+            "ac_count":      len(enriched_static),
+            "discrepancies": verified_enriched,
+            "summary": {
+                "high":   len([d for d in verified_enriched
+                               if d["confidence_label"] == "HIGH"]),
+                "medium": len([d for d in verified_enriched
+                               if d["confidence_label"] == "MEDIUM"]),
+                "low":    len([d for d in verified_enriched
                                if d["confidence_label"] == "LOW"]),
             }
         },

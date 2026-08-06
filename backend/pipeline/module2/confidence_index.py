@@ -6,11 +6,12 @@ from difflib import SequenceMatcher
 
 SEVERITY_MAP = {
     "Missing Element": "HIGH",
+    "Wrong Label": "LOW",
     "Business Rule Violation": "HIGH",
-    "Wrong Label": "MEDIUM",
-    "Layout Constraint Mismatch": "MEDIUM",
-    "Interaction Flow Error": "LOW",
+    "Layout Constraint Mismatch": "LOW",
+    "Interaction Flow Error": "HIGH"
 }
+
 
 VALID_DISCREPANCY_TYPES = set(SEVERITY_MAP.keys())
 
@@ -100,7 +101,7 @@ Respond with only a single word: YES or NO."""
         )
         answer = response.content[0].text.strip().upper()
         print(f"[CI Semantic] '{candidate.get('element_name')}' vs "
-              f"'{group.get('element_name')}' → {answer}")
+              f"'{group.get('element_name')}' -> {answer}")
         return answer == "YES"
 
     except Exception as e:
@@ -265,7 +266,7 @@ def compute_confidence_index(
                         "contributing_passes"
                     ].append(pass_idx)
                     seen_in_this_pass.add(key)
-                    print(f"[CI] MATCHED '{ename}' → group {group_idx} "
+                    print(f"[CI] MATCHED '{ename}' -> group {group_idx} "
                           f"(run_count now "
                           f"{canonical_groups[group_idx]['run_count']})")
 
