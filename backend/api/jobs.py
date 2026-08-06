@@ -5,8 +5,8 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from jobs.job_store import job_store
-from pipeline.orchestrator import process_one_story
+from backend.jobs.job_store import job_store
+from backend.pipeline.orchestrator import process_one_story
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 

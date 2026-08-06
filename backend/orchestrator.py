@@ -1,6 +1,6 @@
 # backend/orchestrator.py (relevant section)
 
-from pipeline.module2_validator import run_module2
+from backend.pipeline.module2_validator import run_module2
 
 def run_pipeline(ticket_id: str):
     # ... Module 1 runs first ...

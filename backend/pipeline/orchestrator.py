@@ -1,21 +1,21 @@
 import json
 import pathlib
 import httpx
-from jobs.job_store import Job
-from integrations.jira_client import (
+from backend.jobs.job_store import Job
+from backend.integrations.jira_client import (
     fetch_single_story,
     fetch_attachment_as_base64,
     create_bug_ticket,
 )
 
-from pipeline.module1.adf_parser import parse_adf
-from pipeline.module1.screen_classifier import classify_screen_type
-from pipeline.module1.uvri import compute_uvri
-from pipeline.module1.inference import infer_implicit_elements
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
-from pipeline.module3.test_generator import generate_dual_mode_tests
-from pipeline.module3.cypress_runner import execute_cypress
+from backend.pipeline.module1.adf_parser import parse_adf
+from backend.pipeline.module1.screen_classifier import classify_screen_type
+from backend.pipeline.module1.uvri import compute_uvri
+from backend.pipeline.module1.inference import infer_implicit_elements
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module3.test_generator import generate_dual_mode_tests
+from backend.pipeline.module3.cypress_runner import execute_cypress
 
 
 RESULTS_DIR = pathlib.Path("output/results")
