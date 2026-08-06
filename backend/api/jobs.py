@@ -14,14 +14,23 @@ router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 class StartJobRequest(BaseModel):
     story_key: str
     app_url: Optional[str] = None
+    nav_path: Optional[str] = None
 
 
 @router.post("")
 async def start_job(req: StartJobRequest, background: BackgroundTasks):
     """Kick off the pipeline for ONE story. Returns the job ID immediately."""
+    app_url = (req.app_url or "").strip() or None
+    nav_path = (req.nav_path or "").strip()
+
     job = job_store.create(req.story_key)
-    background.add_task(process_one_story, job, req.story_key, req.app_url)
-    return {"job_id": job.id, "story_key": req.story_key}
+    background.add_task(process_one_story, job, req.story_key, app_url, nav_path)
+    return {
+        "job_id": job.id,
+        "story_key": req.story_key,
+        "app_url": app_url,
+        "nav_path": nav_path,
+    }
 
 
 @router.get("/{job_id}")

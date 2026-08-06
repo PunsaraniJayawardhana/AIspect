@@ -3,7 +3,7 @@ UVRI (UI-Validation Readiness Index) — Module 1's core metric.
 
 UVRI(s) = alpha*C(s) + beta*A(s) + gamma*G(s) + delta*T(s)
 
-Weights are read from backend.config.settings and default to equal
+Weights are read from config.settings and default to equal
 weighting (0.25 each) until replaced with regression/AHP-fitted values
 produced by backend/scripts/fit_uvri_weights.py.
 """

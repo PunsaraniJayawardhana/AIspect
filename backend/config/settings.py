@@ -9,11 +9,16 @@ JIRA_EMAIL = os.getenv("JIRA_EMAIL")
 JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
 DEFAULT_JIRA_PROJECT_KEY = os.getenv("JIRA_PROJECT_KEY", "")
 
-# Anthropic
+# LLM providers
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "anthropic").lower()
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 MODULE1_MODEL = os.getenv("MODULE1_MODEL", "claude-sonnet-4-6")
 MODULE2_MODEL = os.getenv("MODULE2_MODEL", "claude-opus-4-7")
 MODULE3_MODEL = os.getenv("MODULE3_MODEL", "claude-sonnet-4-6")
+# Backwards-compatible alias for older config keys
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL") or MODULE1_MODEL
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
 # UVRI weights (alpha=coverage, beta=specificity, gamma=ambiguity, delta=testability)
 # Defaults to equal weighting. Replace with the values produced by
@@ -31,3 +36,7 @@ CI_MEDIUM_THRESHOLD = float(os.getenv("CI_MEDIUM_THRESHOLD", "0.60"))
 
 # CORS
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
+FRONTEND_ORIGIN_REGEX = os.getenv(
+    "FRONTEND_ORIGIN_REGEX",
+    r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
+)
