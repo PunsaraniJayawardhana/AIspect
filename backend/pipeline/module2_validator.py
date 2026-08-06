@@ -4,8 +4,8 @@ import os
 import json
 from typing import Dict, Any, List
 
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.module2.confidence_index import compute_confidence_index
 
 
 def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:

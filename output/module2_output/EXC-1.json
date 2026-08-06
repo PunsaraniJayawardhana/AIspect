@@ -1,0 +1,100 @@
+{
+  "ticket_id": "EXC-1",
+  "screen_type": "generic",
+  "high_confidence": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Confirm Password Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The registration form does not include a 'Confirm Password' field, which is required by the acceptance criteria.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+      "feedback": "The 'Confirm Password Field' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Or Divider",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visual divider (such as a horizontal line with 'or' label) between the 'Create Account' button and the 'Sign up with Google' button.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "A visual divider (e.g. a horizontal line with the label 'or') separates the manual registration form from the 'Sign up with Google' button.",
+      "feedback": "The 'Or Divider' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Brand Logo or Name above Registration Form",
+      "discrepancy_type": "Missing Element",
+      "description": "The Exclusive brand name or logo is not displayed prominently above the registration form; it only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo or brand name prominently, above the registration form.",
+      "feedback": "The 'Brand Logo or Name above Registration Form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "medium_confidence": [],
+  "all_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Confirm Password Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The registration form does not include a 'Confirm Password' field, which is required by the acceptance criteria.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+      "feedback": "The 'Confirm Password Field' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Or Divider",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visual divider (such as a horizontal line with 'or' label) between the 'Create Account' button and the 'Sign up with Google' button.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "A visual divider (e.g. a horizontal line with the label 'or') separates the manual registration form from the 'Sign up with Google' button.",
+      "feedback": "The 'Or Divider' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Brand Logo or Name above Registration Form",
+      "discrepancy_type": "Missing Element",
+      "description": "The Exclusive brand name or logo is not displayed prominently above the registration form; it only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo or brand name prominently, above the registration form.",
+      "feedback": "The 'Brand Logo or Name above Registration Form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "summary": {
+    "total_candidates": 3,
+    "high": 3,
+    "medium": 0,
+    "low": 0,
+    "n_passes": 5
+  }
+}

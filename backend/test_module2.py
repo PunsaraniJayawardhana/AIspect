@@ -11,7 +11,7 @@ import base64
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from pipeline.module2_validator import run_module2
+from backend.pipeline.module2_validator import run_module2
 
 
 # ── Load Figma Image ──────────────────────────────────────────

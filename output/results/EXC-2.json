@@ -1,0 +1,695 @@
+{
+  "story_key": "EXC-2",
+  "screen_type": "login",
+  "uvri_pre": 0.862380787037037,
+  "uvri_post": 0.8224764369956549,
+  "delta": -0.03990435004138215,
+  "subterms_pre": {
+    "coverage": 0.5555555555555556,
+    "specificity": 0.84375,
+    "ambiguity": 0.9907407407407407,
+    "testability": 0.875,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "email or username field",
+          "password field",
+          "password show/hide toggle",
+          "login/submit button",
+          "forgot password link",
+          "remember me checkbox",
+          "sign up redirect link",
+          "page title or logo",
+          "social/third-party login option"
+        ],
+        "referenced_elements": [
+          "email or username field",
+          "password field",
+          "login/submit button",
+          "forgot password link",
+          "sign up redirect link"
+        ],
+        "missing_elements": [
+          "password show/hide toggle",
+          "remember me checkbox",
+          "page title or logo",
+          "social/third-party login option"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: Req",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: Req",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Password: R",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Log In Butt",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "There is a recovery path for users who forget their password: — Forget Password Li",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users attempting to log in with invalid credentials should receive an error message",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Users with unregistered accounts should receive an error message: — If the email is",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "There is a path for users who do not yet have an account: — Sign Up Link: Navigates",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 216,
+        "ambiguous_count": 2,
+        "matched_terms": [
+          {
+            "term": "should",
+            "category": "weak_modals"
+          },
+          {
+            "term": "should",
+            "category": "weak_modals"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Emai",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Emai",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Pass",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Log ",
+            "testable": false
+          },
+          {
+            "ac": "There is a recovery path for users who forget their password: — Forget Passw",
+            "testable": true
+          },
+          {
+            "ac": "Users attempting to log in with invalid credentials should receive an error m",
+            "testable": true
+          },
+          {
+            "ac": "Users with unregistered accounts should receive an error message: — If the em",
+            "testable": true
+          },
+          {
+            "ac": "There is a path for users who do not yet have an account: — Sign Up Link: Nav",
+            "testable": true
+          }
+        ]
+      }
+    }
+  },
+  "subterms_post": {
+    "coverage": 0.7777777777777778,
+    "specificity": 0.8666666666666667,
+    "ambiguity": 0.994413407821229,
+    "testability": 0.7333333333333333,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "email or username field",
+          "password field",
+          "password show/hide toggle",
+          "login/submit button",
+          "forgot password link",
+          "remember me checkbox",
+          "sign up redirect link",
+          "page title or logo",
+          "social/third-party login option"
+        ],
+        "referenced_elements": [
+          "email or username field",
+          "password field",
+          "password show/hide toggle",
+          "login/submit button",
+          "forgot password link",
+          "sign up redirect link",
+          "page title or logo"
+        ],
+        "missing_elements": [
+          "remember me checkbox",
+          "social/third-party login option"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: Req",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: Req",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Password: R",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Log In Butt",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "There is a recovery path for users who forget their password: — Forget Password Li",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users attempting to log in with invalid credentials should receive an error message",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Users with unregistered accounts should receive an error message: — If the email is",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "There is a path for users who do not yet have an account: — Sign Up Link: Navigates",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The login screen displays the Exclusive platform logo prominently above the login fo",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The login screen displays a prominent heading such as 'Log In' or 'Sign In' at the",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The login screen displays a subheading or introductory line beneath the main heading",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The email input field is accompanied by a visible label reading 'Email' or 'Email Ad",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The password input field is accompanied by a visible label reading 'Password' positio",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The password input field includes a show/hide toggle icon (e.g. an eye icon) that all",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The login screen displays a descriptive prompt text adjacent to the Sign Up link, suc",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 358,
+        "ambiguous_count": 2,
+        "matched_terms": [
+          {
+            "term": "should",
+            "category": "weak_modals"
+          },
+          {
+            "term": "should",
+            "category": "weak_modals"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: R",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Email: R",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Password:",
+            "testable": true
+          },
+          {
+            "ac": "Users can log in using a manual login form with the following fields: — Log In Bu",
+            "testable": false
+          },
+          {
+            "ac": "There is a recovery path for users who forget their password: — Forget Password L",
+            "testable": true
+          },
+          {
+            "ac": "Users attempting to log in with invalid credentials should receive an error messag",
+            "testable": false
+          },
+          {
+            "ac": "Users with unregistered accounts should receive an error message: — If the email i",
+            "testable": false
+          },
+          {
+            "ac": "There is a path for users who do not yet have an account: — Sign Up Link: Navigate",
+            "testable": true
+          },
+          {
+            "ac": "The login screen displays the Exclusive platform logo prominently above the login f",
+            "testable": true
+          },
+          {
+            "ac": "The login screen displays a prominent heading such as 'Log In' or 'Sign In' at the",
+            "testable": true
+          },
+          {
+            "ac": "The login screen displays a subheading or introductory line beneath the main headin",
+            "testable": true
+          },
+          {
+            "ac": "The email input field is accompanied by a visible label reading 'Email' or 'Email A",
+            "testable": true
+          },
+          {
+            "ac": "The password input field is accompanied by a visible label reading 'Password' posit",
+            "testable": true
+          },
+          {
+            "ac": "The password input field includes a show/hide toggle icon (e.g. an eye icon) that a",
+            "testable": false
+          },
+          {
+            "ac": "The login screen displays a descriptive prompt text adjacent to the Sign Up link, s",
+            "testable": true
+          }
+        ]
+      }
+    }
+  },
+  "explicit_ACs": [
+    "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if empty: \"Email is required\"",
+    "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if invalid: \"Invalid email address\"",
+    "Users can log in using a manual login form with the following fields: — Password: Required. Masked input. — Error if empty: \"Password is required\"",
+    "Users can log in using a manual login form with the following fields: — Log In Button: Validates all fields and authenticates the user. On successful login, redirects to the Home Screen.",
+    "There is a recovery path for users who forget their password: — Forget Password Link: Clicking the text \"Forget Password?\" redirects the user to the password recovery flow/page.",
+    "Users attempting to log in with invalid credentials should receive an error message: — If email/password combination is incorrect, display: \"Invalid email or password\"",
+    "Users with unregistered accounts should receive an error message: — If the email is not associated with an account, display: \"No account found with this email\"",
+    "There is a path for users who do not yet have an account: — Sign Up Link: Navigates users to the registration page."
+  ],
+  "implicit_ACs": [
+    "The login screen displays the Exclusive platform logo prominently above the login form.",
+    "The login screen displays a prominent heading such as 'Log In' or 'Sign In' at the top of the form.",
+    "The login screen displays a subheading or introductory line beneath the main heading, such as 'Enter your details below'.",
+    "The email input field is accompanied by a visible label reading 'Email' or 'Email Address' positioned above or adjacent to the field.",
+    "The password input field is accompanied by a visible label reading 'Password' positioned above or adjacent to the field.",
+    "The password input field includes a show/hide toggle icon (e.g. an eye icon) that allows the user to reveal or conceal the entered password.",
+    "The login screen displays a descriptive prompt text adjacent to the Sign Up link, such as 'Don't have an account?' to contextualise the registration path."
+  ],
+  "all_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Sign Up Link with contextual prompt",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no 'Don't have an account?' prompt text adjacent to or near a Sign Up link within the login form area.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The login screen displays a descriptive prompt text adjacent to the Sign Up link, such as 'Don't have an account?' to contextualise the registration path.",
+      "feedback": "The 'Sign Up Link with contextual prompt' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Password show/hide toggle icon",
+      "discrepancy_type": "Missing Element",
+      "description": "The password input field does not display any show/hide eye icon toggle to allow users to reveal or conceal their entered password.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The password input field includes a show/hide toggle icon (e.g. an eye icon) that allows the user to reveal or conceal the entered password.",
+      "feedback": "The 'Password show/hide toggle icon' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Exclusive platform logo above login form",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no Exclusive platform logo displayed prominently above the login form; the logo only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The login screen displays the Exclusive platform logo prominently above the login form.",
+      "feedback": "The 'Exclusive platform logo above login form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Email Validation Error Messages",
+      "discrepancy_type": "Missing Element",
+      "description": "No inline error message for empty email field is visible in the design.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if empty: \"Email is required\"",
+      "feedback": "The 'Email Validation Error Messages' is missing from the design at form body. This element is required by AC-05 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Login form heading",
+      "discrepancy_type": "Wrong Label",
+      "description": "The heading reads 'Log in to Exclusive' rather than a simple 'Log In' or 'Sign In', which includes extra branding text not specified in the criterion.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "The login screen displays a prominent heading such as 'Log In' or 'Sign In' at the top of the form.",
+      "feedback": "The label or text on 'Login form heading' at form body does not match what is specified in AC-04. This mismatch was detected in 2 out of 5 validation passes and is classified as LOW confidence."
+    },
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Sign Up Link",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no Sign Up link visible within the login form area to navigate unregistered users to the registration page.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "There is a path for users who do not yet have an account: — Sign Up Link: Navigates users to the registration page.",
+      "feedback": "The 'Sign Up Link' is missing from the design at form body. This element is required by AC-06 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-08",
+      "element_name": "Unregistered account error message",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no error message element displayed in the design for the case where the email is not associated with any account.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users with unregistered accounts should receive an error message: — If the email is not associated with an account, display: \"No account found with this email\"",
+      "feedback": "The 'Unregistered account error message' is missing from the design at form body. This element is required by AC-08 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Error message for invalid email format",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible inline error message or indicator showing 'Invalid email address' for improperly formatted email input.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if invalid: \"Invalid email address\"",
+      "feedback": "The 'Error message for invalid email format' is missing from the design at form body. This element is required by AC-07 and was not found in 1 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "high_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Sign Up Link with contextual prompt",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no 'Don't have an account?' prompt text adjacent to or near a Sign Up link within the login form area.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The login screen displays a descriptive prompt text adjacent to the Sign Up link, such as 'Don't have an account?' to contextualise the registration path.",
+      "feedback": "The 'Sign Up Link with contextual prompt' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Password show/hide toggle icon",
+      "discrepancy_type": "Missing Element",
+      "description": "The password input field does not display any show/hide eye icon toggle to allow users to reveal or conceal their entered password.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The password input field includes a show/hide toggle icon (e.g. an eye icon) that allows the user to reveal or conceal the entered password.",
+      "feedback": "The 'Password show/hide toggle icon' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Exclusive platform logo above login form",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no Exclusive platform logo displayed prominently above the login form; the logo only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The login screen displays the Exclusive platform logo prominently above the login form.",
+      "feedback": "The 'Exclusive platform logo above login form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "medium_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Email Validation Error Messages",
+      "discrepancy_type": "Missing Element",
+      "description": "No inline error message for empty email field is visible in the design.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if empty: \"Email is required\"",
+      "feedback": "The 'Email Validation Error Messages' is missing from the design at form body. This element is required by AC-05 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "low_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Login form heading",
+      "discrepancy_type": "Wrong Label",
+      "description": "The heading reads 'Log in to Exclusive' rather than a simple 'Log In' or 'Sign In', which includes extra branding text not specified in the criterion.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "The login screen displays a prominent heading such as 'Log In' or 'Sign In' at the top of the form.",
+      "feedback": "The label or text on 'Login form heading' at form body does not match what is specified in AC-04. This mismatch was detected in 2 out of 5 validation passes and is classified as LOW confidence."
+    },
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Sign Up Link",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no Sign Up link visible within the login form area to navigate unregistered users to the registration page.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "There is a path for users who do not yet have an account: — Sign Up Link: Navigates users to the registration page.",
+      "feedback": "The 'Sign Up Link' is missing from the design at form body. This element is required by AC-06 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-08",
+      "element_name": "Unregistered account error message",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no error message element displayed in the design for the case where the email is not associated with any account.",
+      "location": "form body",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users with unregistered accounts should receive an error message: — If the email is not associated with an account, display: \"No account found with this email\"",
+      "feedback": "The 'Unregistered account error message' is missing from the design at form body. This element is required by AC-08 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Error message for invalid email format",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible inline error message or indicator showing 'Invalid email address' for improperly formatted email input.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can log in using a manual login form with the following fields: — Email: Required. Must be a valid email format. — Error if invalid: \"Invalid email address\"",
+      "feedback": "The 'Error message for invalid email format' is missing from the design at form body. This element is required by AC-07 and was not found in 1 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "tests": [],
+  "cypress_results": [],
+  "bugs_created": []
+}
