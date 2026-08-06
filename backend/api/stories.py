@@ -193,6 +193,7 @@ async def debug_uvri(story_key: str):
             "screen_type": screen_type,
             "explicit_ACs": parsed["explicit_ACs"],
             "implicit_ACs": implicit_ACs,
+            "enriched_ACs": parsed["explicit_ACs"] + implicit_ACs,
             "uvri_pre": uvri_pre,
             "sub_pre": sub_pre,
             "uvri_post": uvri_post,

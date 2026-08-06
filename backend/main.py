@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.config.settings import FRONTEND_ORIGIN, FRONTEND_ORIGIN_REGEX
+from backend.config.settings import FRONTEND_ORIGIN
 from backend.api import stories, jobs
 
 app = FastAPI(title="AIspect API", version="0.1.0")

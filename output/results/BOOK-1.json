@@ -1,0 +1,883 @@
+{
+  "story_key": "BOOK-1",
+  "screen_type": "dashboard",
+  "uvri_pre": 0.8124562500000001,
+  "uvri_post": 0.8635895833333334,
+  "delta": 0.05113333333333325,
+  "subterms_pre": {
+    "coverage": 0.5,
+    "specificity": 0.78125,
+    "ambiguity": 1.0,
+    "testability": 0.8125,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "summary/stat widgets",
+          "navigation sidebar or menu",
+          "chart or graph panel",
+          "recent activity section",
+          "user account indicator",
+          "page title"
+        ],
+        "referenced_elements": [
+          "navigation sidebar or menu",
+          "chart or graph panel",
+          "user account indicator"
+        ],
+        "missing_elements": [
+          "summary/stat widgets",
+          "recent activity section",
+          "page title"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Header Bar: — Displays user's profile icon, name (e.g., \"Nisal Gunasekara\"), and",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Header Bar: — Displays current time and date (e.g., \"12:29 PM\", \"Sep 02, 2023\")",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Header Bar: — Displays a settings (gear) icon in the top-right corner. — On click:",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays the BookWorm logo/icon at the top.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a vertical set of navigation icons (Dashboard, [module",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a logout icon at the bottom of the sidebar. — On cli",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Sidebar Navigation: — The currently active section is visually highlighted.",
+            "checks": {
+              "names_element": true,
+              "observable_state": false,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.25
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Borrowed Book List\" Card: Displays an icon and title. —",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Returned Book List\" Card: Displays an icon and title. —",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quick Action Cards: — \"Let's browse available book inventory\" Card: Displays an icon",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Brand Panel: — Displays \"BookWorm Library\" logo and name, centered between the quick",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quote Panel: — Displays a static motivational quote about reading, attributed to \"~ B",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quote Panel: — Quote content is sourced from a central configuration/CMS so it can b",
+            "checks": {
+              "names_element": true,
+              "observable_state": false,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.25
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a pie/donut chart visualizing the proportion of",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a legend below the chart with color-coded labels",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Chart data reflects the user's real-time borrowing record",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 318,
+        "ambiguous_count": 0,
+        "matched_terms": []
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Header Bar: — Displays user's profile icon, name (e.g., \"Nisal Gunasekara\"),",
+            "testable": true
+          },
+          {
+            "ac": "Header Bar: — Displays current time and date (e.g., \"12:29 PM\", \"Sep 02, 2023\"",
+            "testable": false
+          },
+          {
+            "ac": "Header Bar: — Displays a settings (gear) icon in the top-right corner. — On cli",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays the BookWorm logo/icon at the top.",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a vertical set of navigation icons (Dashboard, [m",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a logout icon at the bottom of the sidebar. — On ",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — The currently active section is visually highlighted.",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Borrowed Book List\" Card: Displays an icon and title.",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Returned Book List\" Card: Displays an icon and title",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Let's browse available book inventory\" Card: Displays an ",
+            "testable": true
+          },
+          {
+            "ac": "Brand Panel: — Displays \"BookWorm Library\" logo and name, centered between the q",
+            "testable": true
+          },
+          {
+            "ac": "Quote Panel: — Displays a static motivational quote about reading, attributed to ",
+            "testable": true
+          },
+          {
+            "ac": "Quote Panel: — Quote content is sourced from a central configuration/CMS so it c",
+            "testable": false
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a pie/donut chart visualizing the proportion ",
+            "testable": true
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a legend below the chart with color-coded lab",
+            "testable": true
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Chart data reflects the user's real-time borrowing rec",
+            "testable": false
+          }
+        ]
+      }
+    }
+  },
+  "subterms_post": {
+    "coverage": 0.8333333333333334,
+    "specificity": 0.78125,
+    "ambiguity": 1.0,
+    "testability": 0.875,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "summary/stat widgets",
+          "navigation sidebar or menu",
+          "chart or graph panel",
+          "recent activity section",
+          "user account indicator",
+          "page title"
+        ],
+        "referenced_elements": [
+          "summary/stat widgets",
+          "navigation sidebar or menu",
+          "chart or graph panel",
+          "user account indicator",
+          "page title"
+        ],
+        "missing_elements": [
+          "recent activity section"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Header Bar: — Displays user's profile icon, name (e.g., \"Nisal Gunasekara\"), and",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Header Bar: — Displays current time and date (e.g., \"12:29 PM\", \"Sep 02, 2023\")",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Header Bar: — Displays a settings (gear) icon in the top-right corner. — On click:",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays the BookWorm logo/icon at the top.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a vertical set of navigation icons (Dashboard, [module",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a logout icon at the bottom of the sidebar. — On cli",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Sidebar Navigation: — The currently active section is visually highlighted.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Borrowed Book List\" Card: Displays an icon and title. —",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Returned Book List\" Card: Displays an icon and title. —",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Quick Action Cards: — \"Let's browse available book inventory\" Card: Displays an icon",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Brand Panel: — Displays \"BookWorm Library\" logo and name, centered between the quick",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Quote Panel: — Displays a static motivational quote about reading, attributed to \"~ B",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Quote Panel: — Quote content is sourced from a central configuration/CMS so it can b",
+            "checks": {
+              "names_element": true,
+              "observable_state": false,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.25
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a pie/donut chart visualizing the proportion of \"",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a legend below the chart with color-coded labels",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Chart data reflects the user's real-time borrowing record",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The 'Your Borrowed Book List' card displays a numeric count of the user's currently b",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The 'Your Returned Book List' card displays a numeric count of the user's returned bo",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The Borrowing Summary section displays the actual numeric values for 'Total Borrowed B",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The header bar displays a visible profile avatar image or placeholder icon representin",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The main content area displays a visible page heading (e.g., 'Dashboard') identifying",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Each sidebar navigation icon displays a visible text label or tooltip (e.g., 'Dashboa",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The Quote Panel displays the full body text of the motivational quote as a statically",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The Brand Panel displays both the BookWorm logo graphic and the 'BookWorm Library' na",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 497,
+        "ambiguous_count": 0,
+        "matched_terms": []
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Header Bar: — Displays user's profile icon, name (e.g., \"Nisal Gunasekara\"),",
+            "testable": true
+          },
+          {
+            "ac": "Header Bar: — Displays current time and date (e.g., \"12:29 PM\", \"Sep 02, 2023\"",
+            "testable": false
+          },
+          {
+            "ac": "Header Bar: — Displays a settings (gear) icon in the top-right corner. — On cli",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays the BookWorm logo/icon at the top.",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a vertical set of navigation icons (Dashboard, [m",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — Displays a logout icon at the bottom of the sidebar. — On ",
+            "testable": true
+          },
+          {
+            "ac": "Sidebar Navigation: — The currently active section is visually highlighted.",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Borrowed Book List\" Card: Displays an icon and title.",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Your Returned Book List\" Card: Displays an icon and title.",
+            "testable": true
+          },
+          {
+            "ac": "Quick Action Cards: — \"Let's browse available book inventory\" Card: Displays an i",
+            "testable": true
+          },
+          {
+            "ac": "Brand Panel: — Displays \"BookWorm Library\" logo and name, centered between the qu",
+            "testable": true
+          },
+          {
+            "ac": "Quote Panel: — Displays a static motivational quote about reading, attributed to ",
+            "testable": true
+          },
+          {
+            "ac": "Quote Panel: — Quote content is sourced from a central configuration/CMS so it c",
+            "testable": false
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a pie/donut chart visualizing the proportion ",
+            "testable": true
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Displays a legend below the chart with color-coded lab",
+            "testable": true
+          },
+          {
+            "ac": "Borrowing Summary Chart: — Chart data reflects the user's real-time borrowing rec",
+            "testable": false
+          },
+          {
+            "ac": "The 'Your Borrowed Book List' card displays a numeric count of the user's current",
+            "testable": true
+          },
+          {
+            "ac": "The 'Your Returned Book List' card displays a numeric count of the user's returne",
+            "testable": true
+          },
+          {
+            "ac": "The Borrowing Summary section displays the actual numeric values for 'Total Borrow",
+            "testable": true
+          },
+          {
+            "ac": "The header bar displays a visible profile avatar image or placeholder icon represe",
+            "testable": true
+          },
+          {
+            "ac": "The main content area displays a visible page heading (e.g., 'Dashboard') identif",
+            "testable": true
+          },
+          {
+            "ac": "Each sidebar navigation icon displays a visible text label or tooltip (e.g., 'Das",
+            "testable": true
+          },
+          {
+            "ac": "The Quote Panel displays the full body text of the motivational quote as a statica",
+            "testable": true
+          },
+          {
+            "ac": "The Brand Panel displays both the BookWorm logo graphic and the 'BookWorm Library'",
+            "testable": true
+          }
+        ]
+      }
+    }
+  },
+  "explicit_ACs": [
+    "Header Bar: — Displays user's profile icon, name (e.g., \"Nisal Gunasekara\"), and role label (e.g., \"User\").",
+    "Header Bar: — Displays current time and date (e.g., \"12:29 PM\", \"Sep 02, 2023\"), updating in real time.",
+    "Header Bar: — Displays a settings (gear) icon in the top-right corner. — On click: navigates to the account/system settings page.",
+    "Sidebar Navigation: — Displays the BookWorm logo/icon at the top.",
+    "Sidebar Navigation: — Displays a vertical set of navigation icons (Dashboard, [module icon], Book Inventory).",
+    "Sidebar Navigation: — Displays a logout icon at the bottom of the sidebar. — On click: logs the user out and redirects to the login page.",
+    "Sidebar Navigation: — The currently active section is visually highlighted.",
+    "Quick Action Cards: — \"Your Borrowed Book List\" Card: Displays an icon and title. — On click: navigates to the page listing all books currently borrowed by the user.",
+    "Quick Action Cards: — \"Your Returned Book List\" Card: Displays an icon and title. — On click: navigates to the page listing the user's book return history.",
+    "Quick Action Cards: — \"Let's browse available book inventory\" Card: Displays an icon and title. — On click: navigates to the Book Inventory / catalog browsing page.",
+    "Brand Panel: — Displays \"BookWorm Library\" logo and name, centered between the quick action cards and the borrowing summary chart.",
+    "Quote Panel: — Displays a static motivational quote about reading, attributed to \"~ BookWorm Team\".",
+    "Quote Panel: — Quote content is sourced from a central configuration/CMS so it can be updated without code changes.",
+    "Borrowing Summary Chart: — Displays a pie/donut chart visualizing the proportion of \"Total Borrowed Books\" vs \"Total Returned Books\" for the logged-in user.",
+    "Borrowing Summary Chart: — Displays a legend below the chart with color-coded labels for \"Total Borrowed Books\" and \"Total Returned Books\".",
+    "Borrowing Summary Chart: — Chart data reflects the user's real-time borrowing record and updates when a book is borrowed or returned."
+  ],
+  "implicit_ACs": [
+    "The 'Your Borrowed Book List' card displays a numeric count of the user's currently borrowed books alongside the icon and title.",
+    "The 'Your Returned Book List' card displays a numeric count of the user's returned books alongside the icon and title.",
+    "The Borrowing Summary section displays the actual numeric values for 'Total Borrowed Books' and 'Total Returned Books' alongside or within the chart, not only as proportional segments.",
+    "The header bar displays a visible profile avatar image or placeholder icon representing the logged-in user, distinct from the user's name text.",
+    "The main content area displays a visible page heading (e.g., 'Dashboard') identifying the current screen to the user.",
+    "Each sidebar navigation icon displays a visible text label or tooltip (e.g., 'Dashboard', 'Book Inventory') adjacent to or overlaying the icon to identify its destination.",
+    "The Quote Panel displays the full body text of the motivational quote as a statically visible string on the dashboard in its default state.",
+    "The Brand Panel displays both the BookWorm logo graphic and the 'BookWorm Library' name as visible, distinct elements centered in the panel."
+  ],
+  "all_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Your Borrowed Book List Card",
+      "discrepancy_type": "Missing Element",
+      "description": "The 'Your Borrowed Book List' card does not display any numeric count of currently borrowed books alongside the icon and title.",
+      "location": "Quick Action Cards - top left",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The 'Your Borrowed Book List' card displays a numeric count of the user's currently borrowed books alongside the icon and title.",
+      "feedback": "The 'Your Borrowed Book List Card' is missing from the design at Quick Action Cards - top left. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Borrowing Summary Chart Legend",
+      "discrepancy_type": "Missing Element",
+      "description": "The chart legend only shows color-coded labels without any actual numeric values for Total Borrowed Books and Total Returned Books.",
+      "location": "Borrowing Summary Chart - bottom right",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The Borrowing Summary section displays the actual numeric values for 'Total Borrowed Books' and 'Total Returned Books' alongside or within the chart, not only as proportional segments.",
+      "feedback": "The 'Borrowing Summary Chart Legend' is missing from the design at Borrowing Summary Chart - bottom right. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Page Heading",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible page heading such as 'Dashboard' displayed in the main content area to identify the current screen.",
+      "location": "main content area",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The main content area displays a visible page heading (e.g., 'Dashboard') identifying the current screen to the user.",
+      "feedback": "The 'Page Heading' is missing from the design at main content area. This element is required by AC-04 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Sidebar Navigation Icons",
+      "discrepancy_type": "Missing Element",
+      "description": "The sidebar navigation icons are displayed without any visible text labels or tooltips to identify their destinations.",
+      "location": "sidebar navigation",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Each sidebar navigation icon displays a visible text label or tooltip (e.g., 'Dashboard', 'Book Inventory') adjacent to or overlaying the icon to identify its destination.",
+      "feedback": "The 'Sidebar Navigation Icons' is missing from the design at sidebar navigation. This element is required by AC-05 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "User Profile Avatar",
+      "discrepancy_type": "Missing Element",
+      "description": "The header bar shows only a small generic icon next to the user's name without a distinct visible profile avatar image or placeholder that clearly represents the logged-in user.",
+      "location": "top navigation",
+      "confidence_index": 0.8,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 4,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The header bar displays a visible profile avatar image or placeholder icon representing the logged-in user, distinct from the user's name text.",
+      "feedback": "The 'User Profile Avatar' is missing from the design at top navigation. This element is required by AC-03 and was not found in 4 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Sidebar Active State Highlight",
+      "discrepancy_type": "Missing Element",
+      "description": "None of the sidebar navigation icons appear to be visually highlighted to indicate the currently active section.",
+      "location": "sidebar navigation",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The currently active section is visually highlighted.",
+      "feedback": "The 'Sidebar Active State Highlight' is missing from the design at sidebar navigation. This element is required by AC-06 and was not found in 1 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Quote Panel - CMS sourcing",
+      "discrepancy_type": "Business Rule Violation",
+      "description": "The design does not provide any indication or annotation that the quote content is dynamically sourced from a CMS or central configuration rather than being hardcoded.",
+      "location": "Quote Panel - bottom center",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Quote content is sourced from a central configuration/CMS so it can be updated without code changes.",
+      "feedback": "The design of 'Quote Panel - CMS sourcing' at Quote Panel - bottom center violates a business rule defined in AC-07. This was flagged in 1 out of 5 validation passes, indicating a significant requirement deviation."
+    }
+  ],
+  "high_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Your Borrowed Book List Card",
+      "discrepancy_type": "Missing Element",
+      "description": "The 'Your Borrowed Book List' card does not display any numeric count of currently borrowed books alongside the icon and title.",
+      "location": "Quick Action Cards - top left",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The 'Your Borrowed Book List' card displays a numeric count of the user's currently borrowed books alongside the icon and title.",
+      "feedback": "The 'Your Borrowed Book List Card' is missing from the design at Quick Action Cards - top left. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Borrowing Summary Chart Legend",
+      "discrepancy_type": "Missing Element",
+      "description": "The chart legend only shows color-coded labels without any actual numeric values for Total Borrowed Books and Total Returned Books.",
+      "location": "Borrowing Summary Chart - bottom right",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The Borrowing Summary section displays the actual numeric values for 'Total Borrowed Books' and 'Total Returned Books' alongside or within the chart, not only as proportional segments.",
+      "feedback": "The 'Borrowing Summary Chart Legend' is missing from the design at Borrowing Summary Chart - bottom right. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Page Heading",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible page heading such as 'Dashboard' displayed in the main content area to identify the current screen.",
+      "location": "main content area",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The main content area displays a visible page heading (e.g., 'Dashboard') identifying the current screen to the user.",
+      "feedback": "The 'Page Heading' is missing from the design at main content area. This element is required by AC-04 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Sidebar Navigation Icons",
+      "discrepancy_type": "Missing Element",
+      "description": "The sidebar navigation icons are displayed without any visible text labels or tooltips to identify their destinations.",
+      "location": "sidebar navigation",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Each sidebar navigation icon displays a visible text label or tooltip (e.g., 'Dashboard', 'Book Inventory') adjacent to or overlaying the icon to identify its destination.",
+      "feedback": "The 'Sidebar Navigation Icons' is missing from the design at sidebar navigation. This element is required by AC-05 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "User Profile Avatar",
+      "discrepancy_type": "Missing Element",
+      "description": "The header bar shows only a small generic icon next to the user's name without a distinct visible profile avatar image or placeholder that clearly represents the logged-in user.",
+      "location": "top navigation",
+      "confidence_index": 0.8,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 4,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The header bar displays a visible profile avatar image or placeholder icon representing the logged-in user, distinct from the user's name text.",
+      "feedback": "The 'User Profile Avatar' is missing from the design at top navigation. This element is required by AC-03 and was not found in 4 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "medium_confidence_discrepancies": [],
+  "low_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Sidebar Active State Highlight",
+      "discrepancy_type": "Missing Element",
+      "description": "None of the sidebar navigation icons appear to be visually highlighted to indicate the currently active section.",
+      "location": "sidebar navigation",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The currently active section is visually highlighted.",
+      "feedback": "The 'Sidebar Active State Highlight' is missing from the design at sidebar navigation. This element is required by AC-06 and was not found in 1 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Quote Panel - CMS sourcing",
+      "discrepancy_type": "Business Rule Violation",
+      "description": "The design does not provide any indication or annotation that the quote content is dynamically sourced from a CMS or central configuration rather than being hardcoded.",
+      "location": "Quote Panel - bottom center",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Quote content is sourced from a central configuration/CMS so it can be updated without code changes.",
+      "feedback": "The design of 'Quote Panel - CMS sourcing' at Quote Panel - bottom center violates a business rule defined in AC-07. This was flagged in 1 out of 5 validation passes, indicating a significant requirement deviation."
+    }
+  ],
+  "tests": [],
+  "cypress_results": [],
+  "bugs_created": []
+}

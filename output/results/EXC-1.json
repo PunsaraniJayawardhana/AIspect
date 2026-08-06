@@ -1,0 +1,370 @@
+{
+  "story_key": "EXC-1",
+  "screen_type": "generic",
+  "uvri_pre": 0.5024269430051813,
+  "uvri_post": 0.4157793650793651,
+  "delta": -0.08664757792581623,
+  "subterms_pre": {
+    "coverage": 0.0,
+    "specificity": 0.0,
+    "ambiguity": 0.9948186528497409,
+    "testability": 0.75,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "page title",
+          "primary action button",
+          "navigation element"
+        ],
+        "referenced_elements": [],
+        "missing_elements": [
+          "page title",
+          "primary action button",
+          "navigation element"
+        ],
+        "error": "Claude API error: Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'Internal server error'}, 'request_id': 'req_011CdXis6UcfLzpEorbu72wd'}"
+      },
+      "specificity": {
+        "per_ac": [],
+        "error": "Claude API error: Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'Internal server error'}, 'request_id': 'req_011CdXis9yxccnN2SmCGwECu'}"
+      },
+      "ambiguity": {
+        "total_words": 193,
+        "ambiguous_count": 1,
+        "matched_terms": [
+          {
+            "term": "quickly",
+            "category": "vague_adjectives_adverbs"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Users can register using a manual registration form with the following fi",
+            "testable": true
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fi",
+            "testable": true
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fi",
+            "testable": true
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fi",
+            "testable": true
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fi",
+            "testable": false
+          },
+          {
+            "ac": "Users can register quickly using their existing Google identity: — Sign up",
+            "testable": false
+          },
+          {
+            "ac": "There is a path for users who already have an account to prevent duplicat",
+            "testable": true
+          },
+          {
+            "ac": "If the email is already registered, display the message: \"An account with ",
+            "testable": true
+          }
+        ]
+      }
+    }
+  },
+  "subterms_post": {
+    "coverage": 0.0,
+    "specificity": 0.7857142857142857,
+    "ambiguity": 0.9968253968253968,
+    "testability": 0.0,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "page title",
+          "primary action button",
+          "navigation element"
+        ],
+        "referenced_elements": [],
+        "missing_elements": [
+          "page title",
+          "primary action button",
+          "navigation element"
+        ],
+        "error": "Claude API error: Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'Internal server error'}, 'request_id': 'req_011CdXit1EdCpz5d4ZBjXjmU'}"
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Users can register using a manual registration form with the following fields: — Nam",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fields: — Ema",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fields: — Pas",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fields: — Con",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can register using a manual registration form with the following fields: — Cre",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Users can register quickly using their existing Google identity: — Sign up with Goog",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "There is a path for users who already have an account to prevent duplicate registrat",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "If the email is already registered, display the message: \"An account with this email",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The sign up screen displays the Exclusive platform logo or brand name prominently, a",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The sign up screen displays a prominent heading such as 'Create Account' or 'Sign Up",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The sign up screen displays a short subtitle or instructional line beneath the headin",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "A visual divider (e.g. a horizontal line with the label 'or') separates the manual r",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The 'Sign up with Google' button displays the recognisable Google logo icon alongside",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The log in link is preceded by static prompt text such as 'Already have an account?'",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 315,
+        "ambiguous_count": 1,
+        "matched_terms": [
+          {
+            "term": "quickly",
+            "category": "vague_adjectives_adverbs"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [],
+        "error": "Claude API error: Error code: 500 - {'type': 'error', 'error': {'type': 'api_error', 'message': 'Internal server error'}, 'request_id': 'req_011CdXitr1GyhueJcpnyWZQJ'}"
+      }
+    }
+  },
+  "explicit_ACs": [
+    "Users can register using a manual registration form with the following fields: — Name: Required. Error if empty: \"Name is required\".",
+    "Users can register using a manual registration form with the following fields: — Email: Required. Must be a valid email format. Error if invalid: \"Invalid email number\".",
+    "Users can register using a manual registration form with the following fields: — Password: Required. Masked input. Error if empty: \"Password is required\".",
+    "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+    "Users can register using a manual registration form with the following fields: — Create Account Button: Validates all fields and creates the account. On success, redirects to the Home Screen.",
+    "Users can register quickly using their existing Google identity: — Sign up with Google Button: Initiates the Google OAuth 2.0 flow when tapped.",
+    "There is a path for users who already have an account to prevent duplicate registrations: — Log in Link: Text \"Log in\" located at the bottom of the form.",
+    "If the email is already registered, display the message: \"An account with this email already exists\"."
+  ],
+  "implicit_ACs": [
+    "The sign up screen displays the Exclusive platform logo or brand name prominently, above the registration form.",
+    "The sign up screen displays a prominent heading such as 'Create Account' or 'Sign Up' at the top of the registration form.",
+    "The sign up screen displays a short subtitle or instructional line beneath the heading, such as 'Enter your details below'.",
+    "A visual divider (e.g. a horizontal line with the label 'or') separates the manual registration form from the 'Sign up with Google' button.",
+    "The 'Sign up with Google' button displays the recognisable Google logo icon alongside its label text.",
+    "The log in link is preceded by static prompt text such as 'Already have an account?' displayed inline at the bottom of the form."
+  ],
+  "all_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Confirm Password Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The registration form does not include a 'Confirm Password' field, which is required by the acceptance criteria.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+      "feedback": "The 'Confirm Password Field' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Or Divider",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visual divider (such as a horizontal line with 'or' label) between the 'Create Account' button and the 'Sign up with Google' button.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "A visual divider (e.g. a horizontal line with the label 'or') separates the manual registration form from the 'Sign up with Google' button.",
+      "feedback": "The 'Or Divider' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Brand Logo or Name above Registration Form",
+      "discrepancy_type": "Missing Element",
+      "description": "The Exclusive brand name or logo is not displayed prominently above the registration form; it only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo or brand name prominently, above the registration form.",
+      "feedback": "The 'Brand Logo or Name above Registration Form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "high_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Confirm Password Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The registration form does not include a 'Confirm Password' field, which is required by the acceptance criteria.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Users can register using a manual registration form with the following fields: — Confirm Password: Required. Masked input. Error if empty: \"Confirm the password\".",
+      "feedback": "The 'Confirm Password Field' is missing from the design at form body. This element is required by AC-01 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Or Divider",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visual divider (such as a horizontal line with 'or' label) between the 'Create Account' button and the 'Sign up with Google' button.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "A visual divider (e.g. a horizontal line with the label 'or') separates the manual registration form from the 'Sign up with Google' button.",
+      "feedback": "The 'Or Divider' is missing from the design at form body. This element is required by AC-02 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Brand Logo or Name above Registration Form",
+      "discrepancy_type": "Missing Element",
+      "description": "The Exclusive brand name or logo is not displayed prominently above the registration form; it only appears in the top navigation bar.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo or brand name prominently, above the registration form.",
+      "feedback": "The 'Brand Logo or Name above Registration Form' is missing from the design at form body. This element is required by AC-03 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    }
+  ],
+  "medium_confidence_discrepancies": [],
+  "low_confidence_discrepancies": [],
+  "tests": [],
+  "cypress_results": [],
+  "bugs_created": []
+}

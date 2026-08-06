@@ -2,8 +2,6 @@ import json
 import os
 import pathlib
 import httpx
-import logging
-import inspect
 from backend.jobs.job_store import Job
 from backend.integrations.jira_client import (
     fetch_single_story,
@@ -17,9 +15,8 @@ from backend.pipeline.module1.uvri import compute_uvri
 from backend.pipeline.module1.inference import infer_implicit_elements
 from backend.pipeline.module2.multipass_validator import run_multipass_validation
 from backend.pipeline.module2.confidence_index import compute_confidence_index
-from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
-from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
-from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
+from backend.pipeline.module3.test_generator import generate_dual_mode_tests
+from backend.pipeline.module3.cypress_runner import execute_cypress
 
 
 RESULTS_DIR        = pathlib.Path("output/results")
