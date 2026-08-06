@@ -440,10 +440,10 @@ export_to_docx(tests, story_key, output_path)
   ├─ Add heading: "Test Cases — {story_key}"
   ├─ Create table with columns:
   │  - TC ID, Mode, Scenario, Priority, TPRI, Rank, Steps, Expected Result
-  └─ Write to: backend/scripts/fixtures/{story_key}_test_cases.docx
+  └─ Write to: output/module3/{story_key}_test_cases.docx
 
 export_to_markdown(tests, story_key, output_path)
-  └─ Write to: backend/scripts/fixtures/{story_key}_test_cases.md
+  └─ Write to: output/module3/{story_key}_test_cases.md
 ```
 
 **Outputs**:
@@ -460,10 +460,9 @@ export_to_markdown(tests, story_key, output_path)
 |------|---------|---|---|---|
 | [orchestrator.py](backend/pipeline/orchestrator.py) | Central pipeline coordinator | All modules | story_key, app_url | job.result |
 | [tpri.py](backend/pipeline/module3/tpri.py) | TPRI scoring & prioritization | llm_client | discrepancies, ACs, story_text | prioritized_discrepancies |
-| [test_generator.py](backend/pipeline/module3/test_generator.py) | Mode 1/2 test case generation | llm_client, fixture_loader | ACs, discrepancies, story_text | test_cases |
+| [test_generator.py](backend/pipeline/module3/test_generator.py) | Mode 1/2 test case generation | llm_client | ACs, discrepancies, story_text | test_cases |
 | [cypress_runner.py](backend/pipeline/module3/cypress_runner.py) | Cypress execution | None | tests (with cypress_script) | tests (with passed/confirmed_fault) |
 | [docx_exporter.py](backend/pipeline/module3/docx_exporter.py) | Test documentation export | python-docx | tests | .docx, .md files |
-| [fixture_loader.py](backend/pipeline/module3/fixture_loader.py) | Development fixture support | None | story_key, data | fixture data or original data |
 | [llm_client.py](backend/pipeline/module3/llm_client.py) | LLM API wrapper | anthropic/groq | prompt, max_tokens | LLM response text |
 
 ### 6.2 Module 3 → Other Components
@@ -592,46 +591,15 @@ tests: List[Dict[str, Any]]
 
 ---
 
-## 8. Fixture-Based Development
+## 8. Live End-to-End Operation
 
-**File**: [backend/pipeline/module3/fixture_loader.py](backend/pipeline/module3/fixture_loader.py)
+Module 3 now consumes live outputs from Module 1 and Module 2 directly.
+The fixture fallback layer has been removed from runtime code.
 
-**Purpose**: Enable Module 3 testing while Module 1 & Module 2 are still being stubbed
+Exported artifacts are written under:
 
-**Environment Variable**: `USE_MODULE_FIXTURES` (default: "true")
-
-**Mechanism**:
-```python
-get_module1_inputs(story_key, explicit_acs, implicit_acs, story_text, nav_path)
-  ├─ If fixtures enabled AND current ACs are stubs:
-  │  └─ Load from: backend/scripts/fixtures/{story_key}_module1.json
-  │     Return: fixture data (real Module 1 output)
-  └─ Else:
-     Return: current data (live output)
-
-get_module2_inputs(story_key, verified_discrepancies)
-  ├─ If fixtures enabled AND discrepancies are empty/stub:
-  │  └─ Load from: backend/scripts/fixtures/{story_key}_module2.json
-  │     Return: fixture data (real Module 2 output)
-  └─ Else:
-     Return: current data (live output)
-```
-
-**Fixture Files**:
-```
-backend/scripts/fixtures/
-├─ EXC-1_module1.json  (Module 1 output: ACs, story, nav_path)
-├─ EXC-1_module2.json  (Module 2 output: verified_discrepancies)
-├─ EXC-2_module1.json
-├─ EXC-2_module2.json
-├─ EXC-3_module1.json
-└─ EXC-3_module2.json
-```
-
-**Benefits**:
-- Module 3 can run independently for testing/refinement
-- Real Module 1/2 data captured in fixture files
-- Developers can test Module 3 without waiting for Module 1/2 completion
+- `output/module2_output/` for Module 2 snapshots
+- `output/module3/` for Module 3 test case exports
 
 ---
 
@@ -759,7 +727,6 @@ GROQ_API_KEY: From env
 
 | Variable | Default | Used By |
 |---|---|---|
-| `USE_MODULE_FIXTURES` | "true" | fixture_loader.py |
 | `LLM_PROVIDER` | "anthropic" | llm_client.py |
 | `CLAUDE_MODEL` | "claude-3-5-sonnet-20241022" | llm_client.py |
 | `GROQ_MODEL` | "mixtral-8x7b-32768" | llm_client.py |
@@ -777,7 +744,6 @@ GROQ_API_KEY: From env
 **Logging Module**: `logging` (standard library)
 
 **Key Log Points**:
-- fixture_loader.py: "Using Module X fixture for {story_key}"
 - tpri.py: "RC scoring failed; using fallback"
 - cypress_runner.py: "Cypress run failed" / "npx not available"
 - llm_client.py: Usage tracking for each API call
@@ -801,7 +767,7 @@ python -m backend.scripts.test_module3_standalone
 ```
 
 **What it does**:
-- Loads Module 1/2 fixtures
+- Loads Module 1/2 outputs from orchestrator result files
 - Runs test generation directly
 - Validates TPRI computation
 - Exports test cases
@@ -848,11 +814,6 @@ python -m backend.scripts.test_module3_standalone
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │  ┌──────────────────────────────────────────────┐  │
-│  │  FIXTURE_LOADER                             │  │
-│  │  (Load dev fixtures if available)           │  │
-│  └────────────────┬─────────────────────────────┘  │
-│                   │                                 │
-│  ┌────────────────▼──────────────────────────────┐  │
 │  │  TEST_GENERATOR (Mode 1 + Mode 2)            │  │
 │  │  ├─ generate_coverage_tests()                │  │
 │  │  ├─ generate_mode2_tests()                   │  │
@@ -927,12 +888,6 @@ curl http://localhost:8000/api/jobs/{job_id}
 python -m backend.scripts.test_module3_standalone
 ```
 
-### To disable fixtures (use live Module 1/2):
-```bash
-export USE_MODULE_FIXTURES=false
-# Then run the pipeline
-```
-
 ---
 
 ## Appendix: File Tree with Module 3 Focus
@@ -965,7 +920,6 @@ backend/
 │       ├── test_generator.py        (Mode 1/2 test generation)
 │       ├── cypress_runner.py        (Cypress execution)
 │       ├── docx_exporter.py         (DOCX/Markdown export)
-│       ├── fixture_loader.py        (Dev fixture loading)
 │       └── llm_client.py            (LLM provider abstraction)
 └── scripts/
     ├── test_module3_standalone.py   (Module 3 testing script)

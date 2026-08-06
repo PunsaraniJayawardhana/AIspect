@@ -19,6 +19,7 @@ from backend.pipeline.module2.multipass_validator import run_multipass_validatio
 from backend.pipeline.module2.confidence_index import compute_confidence_index
 from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
 from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
+from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
 
 
 RESULTS_DIR        = pathlib.Path("output/results")
@@ -98,7 +99,7 @@ def _persist_module2_output(story_key: str, result: dict) -> None:
     )
 
 
-async def process_one_story(job: Job, story_key: str, app_url: str = None):
+async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_path_override: str = ""):
     try:
         job.status = "running"
 
@@ -130,6 +131,8 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         parsed = parse_adf(story["description_adf"])
         story_text = parsed.get("story_text", "")
         nav_path = parsed.get("nav_path", "")
+        if nav_path_override:
+            nav_path = nav_path_override
 
         # ── 3. Download design images ────────────────────────────
         image_attachments = [
@@ -253,15 +256,48 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             app_url=app_url,
             nav_path=nav_path,
         )
+
+        docx_path = export_to_docx(tests, story_key, f"output/module3/{story_key}_test_cases.docx")
+        markdown_path = export_to_markdown(tests, story_key, f"output/module3/{story_key}_test_cases.md")
         await emit(job, "tests_generated", {"test_count": len(tests)})
 
         # ── 10. Module 3 — Cypress execution ────────────────────────
         cypress_results = []
         bugs_created = []
         if app_url:
-            await emit(job, "running_cypress")
-            cypress_results = await execute_cypress(tests, app_url)
-            await emit(job, "cypress_done", {"results": cypress_results})
+            defect_only_mode = str(os.environ.get("MODULE3_DEFECT_ONLY", "")).strip().lower() in {"1", "true", "yes", "on"}
+            await emit(job, "running_cypress", {
+                "execution_mode": "defect_only" if defect_only_mode else "ticket_level",
+                "execution_mode_source": "MODULE3_DEFECT_ONLY" if defect_only_mode else "default",
+                "test_breakdown": {
+                    "defect_first": {
+                        "generated": sum(1 for test in tests if test.get("mode") == "defect_first"),
+                    },
+                    "coverage_first": {
+                        "generated": sum(1 for test in tests if test.get("mode") == "coverage_first"),
+                    },
+                }
+            })
+            cypress_results = await execute_cypress(tests, app_url, defects_only=defect_only_mode)
+            await emit(job, "cypress_done", {
+                "results": cypress_results,
+                "execution_mode": "defect_only" if defect_only_mode else "ticket_level",
+                "execution_mode_source": "MODULE3_DEFECT_ONLY" if defect_only_mode else "default",
+                "test_breakdown": {
+                    "defect_first": {
+                        "executed": sum(1 for result in cypress_results if result.get("mode") == "defect_first"),
+                        "passed": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("passed") is True),
+                        "failed": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("confirmed_fault") is True),
+                        "skipped": sum(1 for result in cypress_results if result.get("mode") == "defect_first" and result.get("passed") is None),
+                    },
+                    "coverage_first": {
+                        "executed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first"),
+                        "passed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("passed") is True),
+                        "failed": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("confirmed_fault") is True),
+                        "skipped": sum(1 for result in cypress_results if result.get("mode") == "coverage_first" and result.get("passed") is None),
+                    },
+                },
+            })
 
             cypress_object_ids = {id(item) for item in cypress_results}
 
@@ -307,9 +343,16 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
         await emit(job, "module3_done", {"bugs_created": len(bugs_created)})
 
         # ── 11. Final result ────────────────────────────────────────
+        defect_tests = [test for test in tests if test.get("mode") == "defect_first"]
+        coverage_tests = [test for test in tests if test.get("mode") == "coverage_first"]
+        defect_results = [result for result in cypress_results if result.get("mode") == "defect_first"]
+        coverage_results = [result for result in cypress_results if result.get("mode") == "coverage_first"]
+
         job.result = {
             "story_key":   story_key,
             "screen_type": screen_type,
+            "app_url": app_url,
+            "nav_path": nav_path,
             "uvri_pre":    uvri_pre,
             "uvri_post":   uvri_post,
             "delta":       uvri_post - uvri_pre,
@@ -324,8 +367,28 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None):
             "medium_confidence_discrepancies": medium_confidence,
             "low_confidence_discrepancies":    low_confidence,
             "tests":           tests,
+            "test_breakdown": {
+                "defect_first": {
+                    "generated": len(defect_tests),
+                    "executed": len(defect_results),
+                    "passed": sum(1 for item in defect_results if item.get("passed") is True),
+                    "failed": sum(1 for item in defect_results if item.get("confirmed_fault") is True),
+                    "skipped": sum(1 for item in defect_results if item.get("passed") is None),
+                },
+                "coverage_first": {
+                    "generated": len(coverage_tests),
+                    "executed": len(coverage_results),
+                    "passed": sum(1 for item in coverage_results if item.get("passed") is True),
+                    "failed": sum(1 for item in coverage_results if item.get("confirmed_fault") is True),
+                    "skipped": sum(1 for item in coverage_results if item.get("passed") is None),
+                },
+            },
             "cypress_results": cypress_results,
             "bugs_created":    bugs_created,
+            "exports": {
+                "docx": docx_path,
+                "markdown": markdown_path,
+            },
         }
         _persist_result(story_key, job.result)
         job.status = "completed"

@@ -48,7 +48,7 @@ Module 3 receives:
 - `story_text`
 - `nav_path`
 
-`get_module1_inputs()` is used to normalize and fill in missing values from fixtures when needed.
+Inputs are consumed directly from Module 1 outputs without fixture fallback.
 
 ### From Module 2
 
@@ -56,7 +56,7 @@ Module 3 receives:
 
 - `verified_discrepancies`
 
-`get_module2_inputs()` is used to normalize values from fixtures.
+Discrepancy inputs are consumed directly from Module 2 outputs.
 
 ## Internal processing
 
@@ -180,7 +180,7 @@ The current orchestration flow then uses `get_confirmed_faults()` to identify co
 
 The standalone runner writes JSON output to:
 
-- `backend/scripts/fixtures/<story_key>_module3_output.json`
+- `output/module3/<story_key>_module3_output.json`
 
 The JSON includes:
 
@@ -208,7 +208,7 @@ The JSON includes:
 ### What the standalone runner does
 
 1. Resets the usage log.
-2. Loads module inputs from fixtures.
+2. Loads module inputs from `output/results/<story_key>.json`.
 3. Calls `run_test_generator()`.
 4. Runs Cypress if `app_url` is present.
 5. Exports artifacts.

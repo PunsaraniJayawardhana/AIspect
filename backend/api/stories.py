@@ -3,7 +3,7 @@ from typing import Optional
 import httpx
 import base64
 import traceback
-from config.settings import (
+from backend.config.settings import (
     JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN, DEFAULT_JIRA_PROJECT_KEY
 )
 from backend.integrations.jira_client import fetch_story_keys
@@ -169,11 +169,11 @@ async def debug_uvri(story_key: str):
     number came from without running Module 2/3 or Cypress.
     """
     try:
-        from integrations.jira_client import fetch_single_story
-        from pipeline.module1.adf_parser import parse_adf
-        from pipeline.module1.screen_classifier import classify_screen_type
-        from pipeline.module1.uvri import compute_uvri
-        from pipeline.module1.inference import infer_implicit_elements
+        from backend.integrations.jira_client import fetch_single_story
+        from backend.pipeline.module1.adf_parser import parse_adf
+        from backend.pipeline.module1.screen_classifier import classify_screen_type
+        from backend.pipeline.module1.uvri import compute_uvri
+        from backend.pipeline.module1.inference import infer_implicit_elements
 
         story = await fetch_single_story(story_key)
         if story["description_adf"] is None:

@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import base64
 import io
@@ -91,7 +91,7 @@ def _resize_image_if_needed(img_b64: str) -> str:
     Resize image if either dimension exceeds Claude's 8000px limit.
     Returns original base64 if within limits, resized base64 otherwise.
 
-    NOTE: this still runs after _prepare_design_images, as a safety net —
+    NOTE: this still runs after _prepare_design_images, as a safety net â€”
     but with splitting now handled upstream, individual bands should
     rarely need this except for oversized single-section screenshots.
     """
@@ -138,7 +138,7 @@ def _resize_image_if_needed(img_b64: str) -> str:
               "Run: pip install Pillow --break-system-packages")
         return img_b64
     except Exception as e:
-        print(f"[Module2] Image resize failed: {e} — using original")
+        print(f"[Module2] Image resize failed: {e} â€” using original")
         return img_b64
 
 

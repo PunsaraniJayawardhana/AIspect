@@ -7,7 +7,7 @@ AIspect is a FastAPI-based backend that orchestrates a Jira-driven story-process
 - Fetching Jira stories and media
 - Running a staged processing pipeline for a single story
 - Exposing job lifecycle APIs for asynchronous execution
-- Providing a utility script to export a Module 2 fixture for a story
+- Providing a utility script to export a live Module 2 snapshot for a story
 
 The repository is currently in a **partially implemented state**: the orchestration layer and integrations are present, while several pipeline modules are implemented as deterministic stubs rather than full AI-backed logic.
 
@@ -19,7 +19,7 @@ The system aims to:
 2. Parse and enrich story requirements.
 3. Run Module 1, Module 2, and Module 3 processing stages.
 4. Provide APIs for job creation, status polling, and Server-Sent Events streaming.
-5. Export Module 2 fixture data for offline analysis or debugging.
+5. Export Module 2 output data for analysis or debugging.
 
 ## 3. Current Technology Stack
 
@@ -71,7 +71,7 @@ The system aims to:
 
 ### Scripts
 - [backend/scripts/__init__.py](backend/scripts/__init__.py)
-- [backend/scripts/export_module2_fixture.py](backend/scripts/export_module2_fixture.py)
+- [backend/scripts/export_module2_snapshot.py](backend/scripts/export_module2_snapshot.py)
 
 ## 5. Runtime Architecture
 
@@ -187,18 +187,18 @@ Implemented in [backend/pipeline/orchestrator.py](backend/pipeline/orchestrator.
 
 ### 7.4 Utility script
 
-Implemented in [backend/scripts/export_module2_fixture.py](backend/scripts/export_module2_fixture.py):
+Implemented in [backend/scripts/export_module2_snapshot.py](backend/scripts/export_module2_snapshot.py):
 
-- Exports a JSON fixture for a given story key
+- Exports a Module 2 JSON snapshot for a given story key
 - Reads story data from Jira
 - Parses ADF
 - Runs Module 2 validation and confidence computation
-- Writes output to `backend/scripts/fixtures/<story>.json`
+- Writes output to `output/module2_output/<story>.json`
 
 Example usage:
 
 ```bash
-python -m backend.scripts.export_module2_fixture EXC-1
+python -m backend.scripts.export_module2_snapshot EXC-1
 ```
 
 ## 8. Current Implementation Details by Module

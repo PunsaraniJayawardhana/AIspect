@@ -3,10 +3,64 @@ import os
 import platform
 import subprocess
 import asyncio
+import re
+
+logger = logging.getLogger(__name__)
 
 CYPRESS_PROJECT_DIR = os.environ.get("CYPRESS_PROJECT_DIR")
 
-logger = logging.getLogger(__name__)
+
+def _read_int_env(name, default):
+    raw_value = os.environ.get(name)
+    if raw_value is None:
+        return default
+
+    text_value = (raw_value or "").strip()
+    if not text_value:
+        return default
+
+    try:
+        return int(text_value)
+    except (TypeError, ValueError):
+        logger.warning("Ignoring invalid %s=%r; using default %s", name, raw_value, default)
+        return default
+
+
+CYPRESS_HOLD_SECONDS = _read_int_env("CYPRESS_HOLD_SECONDS", 120)
+DEFAULT_CYPRESS_RUN_TIMEOUT_SECONDS = 120
+CYPRESS_RUN_TIMEOUT_SECONDS = _read_int_env(
+    "CYPRESS_RUN_TIMEOUT_SECONDS",
+    max(DEFAULT_CYPRESS_RUN_TIMEOUT_SECONDS, CYPRESS_HOLD_SECONDS + 30),
+)
+
+
+def _get_cypress_hold_seconds():
+    return _read_int_env("CYPRESS_HOLD_SECONDS", CYPRESS_HOLD_SECONDS)
+
+
+def _get_cypress_run_timeout_seconds():
+    return _read_int_env(
+        "CYPRESS_RUN_TIMEOUT_SECONDS",
+        max(DEFAULT_CYPRESS_RUN_TIMEOUT_SECONDS, _get_cypress_hold_seconds() + 30),
+    )
+
+
+def _resolve_cypress_project_dir():
+    configured_dir = (os.environ.get("CYPRESS_PROJECT_DIR") or CYPRESS_PROJECT_DIR or "").strip()
+    if configured_dir:
+        return configured_dir
+
+    module_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    candidates = [
+        os.getcwd(),
+        module_root,
+    ]
+
+    for candidate in candidates:
+        if candidate and os.path.isdir(candidate):
+            return candidate
+
+    return os.getcwd() or module_root or "."
 
 # Execution errors mean the generated Cypress test file itself could not run.
 EXECUTION_ERROR_MARKERS = (
@@ -43,24 +97,48 @@ def _is_connection_error(output: str) -> bool:
 
 
 def _build_spec_path(test):
-    spec_dir = os.path.join(CYPRESS_PROJECT_DIR, "cypress", "e2e", "aispect_generated")
+    project_dir = _resolve_cypress_project_dir()
+    spec_dir = os.path.join(project_dir, "cypress", "e2e", "aispect_generated")
     os.makedirs(spec_dir, exist_ok=True)
     return os.path.join(spec_dir, f"{test['tc_id']}.cy.js")
 
 
 def _run_single_cypress_spec(spec_path):
     use_shell = platform.system() == "Windows"
+    project_dir = _resolve_cypress_project_dir()
+    timeout_seconds = _get_cypress_run_timeout_seconds()
     return subprocess.run(
-        ["npx", "cypress", "run", "--spec", spec_path, "--headless"],
+        ["npx", "cypress", "run", "--spec", spec_path, "--headed"],
         capture_output=True,
         text=True,
         encoding="utf-8",
         errors="replace",
-        timeout=120,
+        timeout=timeout_seconds,
         check=False,
-        cwd=CYPRESS_PROJECT_DIR,
+        cwd=project_dir,
         shell=use_shell,
     )
+
+
+def _script_with_hold_delay(script: str) -> str:
+    """Optionally keep headed browser open for observation after each test."""
+    hold_seconds = _get_cypress_hold_seconds()
+    if hold_seconds <= 0:
+        return script
+
+    hold_line = f"    cy.wait({hold_seconds * 1000});\n"
+
+    # Insert wait before the common test/function close block if present.
+    marker = "  });\n});\n"
+    if marker in script:
+        return script.replace(marker, hold_line + marker, 1)
+
+    # Fallback for slight formatting variations.
+    patched, count = re.subn(r"\n\s*\}\);\s*\n\}\);\s*$", f"\n{hold_line}  }});\n}});\n", script)
+    if count > 0:
+        return patched
+
+    return script
 
 
 def _apply_cypress_result(test, result):
@@ -97,9 +175,10 @@ def _apply_cypress_result(test, result):
 
 def _handle_non_defect_test(test, defects_only, updated):
     if test.get("mode") != "defect_first":
-        if not defects_only:
+        if defects_only:
             updated.append(test)
-        return True
+            return True
+        return False
     return False
 
 
@@ -116,8 +195,9 @@ def _handle_missing_script(test, updated):
 def _execute_one_test(test):
     spec_path = _build_spec_path(test)
     try:
+        script = _script_with_hold_delay(test["cypress_script"])
         with open(spec_path, "w", encoding="utf-8") as handle:
-            handle.write(test["cypress_script"])
+            handle.write(script)
 
         result = _run_single_cypress_spec(spec_path)
         _apply_cypress_result(test, result)
@@ -144,6 +224,9 @@ def run_cypress_tests(tests, defects_only=False):
 
     for test in tests or []:
         if _handle_non_defect_test(test, defects_only, updated):
+            if defects_only:
+                continue
+            updated.append(test)
             continue
 
         if _handle_missing_script(test, updated):
@@ -160,7 +243,7 @@ def get_confirmed_faults(cypress_results):
     return [test for test in cypress_results or [] if test.get("confirmed_fault") is True]
 
 
-async def execute_cypress(tests, app_url=None):
+async def execute_cypress(tests, app_url=None, defects_only=False):
     """Async wrapper expected by orchestrator; runs sync Cypress runner in a thread."""
     del app_url
-    return await asyncio.to_thread(run_cypress_tests, tests, True)
+    return await asyncio.to_thread(run_cypress_tests, tests, defects_only)

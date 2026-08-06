@@ -5,8 +5,8 @@ import json
 import asyncio
 from typing import Dict, Any, List
 
-from pipeline.module2.multipass_validator import run_multipass_validation
-from pipeline.module2.confidence_index import compute_confidence_index
+from backend.pipeline.module2.multipass_validator import run_multipass_validation
+from backend.pipeline.module2.confidence_index import compute_confidence_index
 
 
 def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:
@@ -48,6 +48,11 @@ def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:
     
     print(f"\n[Module2] Starting validation for ticket: {ticket_id}")
     print(f"[Module2] Criteria count: {len(criteria)}, Images: {len(design_images)}, Passes: {n_passes}")
+
+    canonical_acs = [
+        {"ac_id": f"AC-{idx:02d}", "text": ac}
+        for idx, ac in enumerate(criteria, start=1)
+    ]
     
     if not criteria:
         raise ValueError(f"[Module2] No acceptance criteria received for ticket {ticket_id}")
@@ -59,7 +64,11 @@ def run_module2(module1_output: Dict[str, Any]) -> Dict[str, Any]:
     
     # Step 2: Compute confidence index and classify
     all_discrepancies = compute_confidence_index(
-        all_pass_results, n_passes, high_threshold, medium_threshold
+        all_pass_results,
+        n_passes,
+        high_threshold,
+        medium_threshold,
+        canonical_acs=canonical_acs,
     )
     
     high_confidence = [

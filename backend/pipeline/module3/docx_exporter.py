@@ -28,7 +28,7 @@ def _ensure_parent(path):
 
 
 def export_to_docx(tests, story_key, output_path=None):
-    output_path = output_path or f"backend/scripts/fixtures/{story_key}_test_cases.docx"
+    output_path = output_path or f"output/module3/{story_key}_test_cases.docx"
     _ensure_parent(output_path)
 
     document = Document()
@@ -64,7 +64,7 @@ def export_to_docx(tests, story_key, output_path=None):
 
 
 def export_to_markdown(tests, story_key, output_path=None):
-    output_path = output_path or f"backend/scripts/fixtures/{story_key}_test_cases.md"
+    output_path = output_path or f"output/module3/{story_key}_test_cases.md"
     _ensure_parent(output_path)
 
     rows = _normalized_rows(tests)

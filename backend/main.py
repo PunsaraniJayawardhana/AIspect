@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.config.settings import FRONTEND_ORIGIN
+from backend.config.settings import FRONTEND_ORIGIN, FRONTEND_ORIGIN_REGEX
 from backend.api import stories, jobs
 
 app = FastAPI(title="AIspect API", version="0.1.0")
@@ -9,6 +9,7 @@ app = FastAPI(title="AIspect API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_ORIGIN],
+    allow_origin_regex=FRONTEND_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

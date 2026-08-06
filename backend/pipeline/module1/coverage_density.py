@@ -11,10 +11,10 @@ taxonomy vocabulary avoids a separate fuzzy-matching step.
 """
 
 from typing import List, Tuple, Dict, Any
-from integrations.claude_client import call_claude_json
-from config.settings import MODULE1_MODEL
-from lexicons.screen_element_taxonomy import get_expected_elements
-from prompts.module1_uvri_prompts import (
+from backend.integrations.claude_client import call_claude_json
+from backend.config.settings import MODULE1_MODEL
+from backend.lexicons.screen_element_taxonomy import get_expected_elements
+from backend.prompts.module1_uvri_prompts import (
     COVERAGE_SYSTEM_PROMPT,
     build_coverage_user_prompt,
 )
