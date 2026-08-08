@@ -34,6 +34,11 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+try:
+    import openpyxl  # noqa: F401
+except ImportError:  # pragma: no cover - optional dependency
+    openpyxl = None
+
 # Final AHP-derived weights (see backend/scripts/fit_ahp_weights.py)
 WEIGHTS = {
     "coverage": 0.0697,
@@ -59,6 +64,11 @@ def load_data(path: str) -> pd.DataFrame:
     instead of 'amb_post') and drops rows with no story_id (blank trailing
     rows some spreadsheet tools leave behind).
     """
+    if openpyxl is None:
+        raise ImportError(
+            "Missing optional dependency 'openpyxl'. Install it with: pip install openpyxl"
+        )
+
     df = pd.read_excel(path, sheet_name=0)
     df.columns = df.columns.str.strip()
     df = df.dropna(subset=["story_id"]).reset_index(drop=True)
@@ -82,7 +92,7 @@ def wilcoxon_delta_test(df: pd.DataFrame):
     uvri_post = compute_uvri(df, COL_MAP_POST, WEIGHTS)
 
     print("=" * 70)
-    print("1. DELTA-UVRI SIGNIFICANCE (paired Wilcoxon signed-rank test)")
+    print("DELTA-UVRI SIGNIFICANCE (paired Wilcoxon signed-rank test)")
     print("=" * 70)
     print(f"Using final AHP weights: {WEIGHTS}\n")
 
@@ -118,7 +128,7 @@ def wilcoxon_delta_test(df: pd.DataFrame):
 
 def known_groups_test(df: pd.DataFrame, uvri_pre: np.ndarray):
     print("=" * 70)
-    print("2. KNOWN-GROUPS VALIDITY (Mann-Whitney U, median split)")
+    print("KNOWN-GROUPS VALIDITY (Mann-Whitney U, median split)")
     print("=" * 70)
     expert = df["expert_rating"].values
 
@@ -161,7 +171,7 @@ def known_groups_test(df: pd.DataFrame, uvri_pre: np.ndarray):
 
 def ablation_study(df: pd.DataFrame):
     print("=" * 70)
-    print("3. ABLATION STUDY (correlation with expert_rating, term removed)")
+    print("ABLATION STUDY (correlation with expert_rating, term removed)")
     print("=" * 70)
     df_valid = df.dropna(subset=["expert_rating"]).reset_index(drop=True)
     expert = df_valid["expert_rating"].values
@@ -189,7 +199,7 @@ def ablation_study(df: pd.DataFrame):
 
 def sensitivity_analysis(df: pd.DataFrame):
     print("=" * 70)
-    print("4. SENSITIVITY ANALYSIS (perturb each weight +/-0.05, renormalised)")
+    print("SENSITIVITY ANALYSIS (perturb each weight +/-0.05, renormalised)")
     print("=" * 70)
     df_valid = df.dropna(subset=["expert_rating"]).reset_index(drop=True)
     expert = df_valid["expert_rating"].values
