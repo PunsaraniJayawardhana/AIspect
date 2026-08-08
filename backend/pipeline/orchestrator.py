@@ -15,7 +15,7 @@ from backend.pipeline.module1.uvri import compute_uvri
 from backend.pipeline.module1.inference import infer_implicit_elements
 from backend.pipeline.module2.multipass_validator import run_multipass_validation
 from backend.pipeline.module2.confidence_index import compute_confidence_index
-from backend.pipeline.module3.test_generator import generate_dual_mode_tests
+from backend.pipeline.module3.test_generator import run_test_generator
 from backend.pipeline.module3.cypress_runner import execute_cypress
 
 
@@ -243,7 +243,7 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
 
         # ── 9. Module 3 — Test generation ───────────────────────────
         await emit(job, "generating_tests")
-        tests = generate_dual_mode_tests(
+        tests = run_test_generator(
             verified,
             explicit_ACs,
             implicit_ACs,

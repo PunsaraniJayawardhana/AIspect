@@ -32,6 +32,7 @@ SCREEN_ELEMENT_TAXONOMY: Dict[str, List[str]] = {
         "name field",
         "email field",
         "password field",
+        "password show/hide toggle",
         "confirm password field",
         "create account button",
         "third-party auth option (e.g. Google)",
