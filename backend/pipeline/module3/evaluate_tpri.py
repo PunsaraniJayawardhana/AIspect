@@ -28,11 +28,11 @@ def compute_apfd(fault_first_positions, n):
     """
 
     if n <= 0:
-        return 1.0
+        return None
 
     positions = [int(position) for position in fault_first_positions or [] if int(position) > 0]
     if not positions:
-        return 1.0
+        return None
 
     m = len(positions)
     return 1 - (sum(positions) / (n * m)) + (1 / (2 * n))
@@ -126,25 +126,30 @@ def evaluate_orderings(test_results, random_runs=30, seed=42):
     base_random = list(results)
     for run_index in range(random_runs):
         shuffled = _deterministic_shuffle(base_random, seed, run_index)
-        random_apfd_values.append(compute_apfd(_fault_positions_for_order(shuffled), len(shuffled)))
+        random_apfd = compute_apfd(_fault_positions_for_order(shuffled), len(shuffled))
+        if random_apfd is not None:
+            random_apfd_values.append(random_apfd)
         random_ttff_values.append(compute_ttff(shuffled))
+
+    tpri_apfd = compute_apfd(_fault_positions_for_order(tpri_ordered), len(tpri_ordered))
+    ac_apfd = compute_apfd(_fault_positions_for_order(ac_ordered), len(ac_ordered))
 
     return {
         "n_tests": len(results),
         "n_faults": len(_fault_positions_for_order(tpri_ordered)),
         "orderings": {
             "tpri": {
-                "apfd": compute_apfd(_fault_positions_for_order(tpri_ordered), len(tpri_ordered)),
+                "apfd": tpri_apfd,
                 "ttff": compute_ttff(tpri_ordered),
                 "ordered_tc_ids": [item.get("tc_id") for item in tpri_ordered],
             },
             "ac_declaration": {
-                "apfd": compute_apfd(_fault_positions_for_order(ac_ordered), len(ac_ordered)),
+                "apfd": ac_apfd,
                 "ttff": compute_ttff(ac_ordered),
                 "ordered_tc_ids": [item.get("tc_id") for item in ac_ordered],
             },
             "random": {
-                "apfd": mean(random_apfd_values) if random_apfd_values else 1.0,
+                "apfd": mean(random_apfd_values) if random_apfd_values else None,
                 "ttff": mean(random_ttff_values) if random_ttff_values else float(len(results) + 1),
                 "runs": random_runs,
             },

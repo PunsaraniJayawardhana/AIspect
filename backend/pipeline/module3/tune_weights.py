@@ -112,7 +112,8 @@ def tune_weights(evaluation_tickets, step=0.1):
     candidates = []
     for weights in _grid_values(step):
         ticket_scores = [_evaluate_ticket(ticket, weights) for ticket in tickets]
-        mean_apfd = sum(item["apfd"] for item in ticket_scores) / len(ticket_scores)
+        valid_apfd_values = [item["apfd"] for item in ticket_scores if item["apfd"] is not None]
+        mean_apfd = (sum(valid_apfd_values) / len(valid_apfd_values)) if valid_apfd_values else 0.0
         candidates.append(
             {
                 "weights": weights,
