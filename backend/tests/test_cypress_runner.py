@@ -53,11 +53,14 @@ def test_invalid_timeout_environment_falls_back_to_default(monkeypatch):
     assert cypress_runner._get_cypress_hold_seconds() == 0
 
 
-def test_run_cypress_tests_executes_coverage_tests_by_default(monkeypatch):
+# Coverage-first tests are deliverable documentation, not part of automated defect verification.
+def test_run_cypress_tests_appends_coverage_tests_unexecuted(monkeypatch):
     executed = []
 
     def fake_execute_one_test(test):
         executed.append(test["tc_id"])
+        test["passed"] = True
+        test["confirmed_fault"] = False
 
     monkeypatch.setattr(cypress_runner, "_execute_one_test", fake_execute_one_test)
 
@@ -69,7 +72,11 @@ def test_run_cypress_tests_executes_coverage_tests_by_default(monkeypatch):
     result = cypress_runner.run_cypress_tests(tests)
 
     assert [item["tc_id"] for item in result] == ["TC-M2-001", "TC-M1-001"]
-    assert executed == ["TC-M2-001", "TC-M1-001"]
+    assert executed == ["TC-M2-001"]
+    assert result[0]["passed"] is True
+    assert result[0]["confirmed_fault"] is False
+    assert result[1].get("passed") is None
+    assert result[1].get("confirmed_fault") is None
 
 
 def test_execute_cypress_can_request_defect_only_mode(monkeypatch):

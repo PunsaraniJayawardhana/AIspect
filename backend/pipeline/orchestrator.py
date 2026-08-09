@@ -15,8 +15,11 @@ from backend.pipeline.module1.uvri import compute_uvri
 from backend.pipeline.module1.inference import infer_implicit_elements
 from backend.pipeline.module2.multipass_validator import run_multipass_validation
 from backend.pipeline.module2.confidence_index import compute_confidence_index
-from backend.pipeline.module3.test_generator import run_test_generator
-from backend.pipeline.module3.cypress_runner import execute_cypress
+from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
+from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
+from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
+from backend.pipeline.module3.evaluate_tpri import load_ticket_results
+from backend.pipeline.module3.generate_eval_report import refresh_results_table
 
 
 RESULTS_DIR        = pathlib.Path("output/results")
@@ -94,6 +97,68 @@ def _persist_module2_output(story_key: str, result: dict) -> None:
         json.dumps(result, indent=2, ensure_ascii=False),
         encoding="utf-8",
     )
+
+
+def _discover_evaluable_ticket_ids() -> list[str]:
+    ticket_ids = []
+    if not RESULTS_DIR.exists():
+        return ticket_ids
+
+    for result_file in sorted(RESULTS_DIR.glob("*.json")):
+        try:
+            tests = load_ticket_results(result_file)
+        except Exception:
+            continue
+
+        if isinstance(tests, list) and tests:
+            ticket_ids.append(result_file.stem)
+
+    return ticket_ids
+
+
+def _refresh_eval_results_table(story_key: str) -> None:
+    ticket_ids = _discover_evaluable_ticket_ids()
+    if story_key in ticket_ids:
+        ticket_ids = [story_key] + [ticket_id for ticket_id in ticket_ids if ticket_id != story_key]
+
+    if not ticket_ids:
+        print("[Eval] Skipping results table refresh: no evaluable ticket result files found.")
+        return
+
+    try:
+        refresh_results_table(ticket_ids)
+        print(f"[Eval] Refreshed output/eval/results_table.csv for {len(ticket_ids)} ticket(s).")
+    except Exception as exc:
+        # Keep ticket processing resilient if eval artifact generation fails.
+        print(f"[Eval] Results table refresh failed: {exc}")
+
+
+def _truncate_summary(text, max_length=255):
+    text = str(text or "")
+    if len(text) <= max_length:
+        return text
+
+    ellipsis = "..."
+    if max_length <= len(ellipsis):
+        return ellipsis[:max_length]
+
+    cutoff = max_length - len(ellipsis)
+    truncated = text[:cutoff].rstrip()
+    last_space = max(
+        truncated.rfind(" "),
+        truncated.rfind("\t"),
+        truncated.rfind("\n"),
+        truncated.rfind("\r"),
+    )
+
+    if last_space == -1:
+        return ellipsis
+
+    truncated = truncated[:last_space].rstrip()
+    if not truncated:
+        return ellipsis
+
+    return f"{truncated}{ellipsis}"
 
 
 async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_path_override: str = ""):
@@ -315,7 +380,10 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
             for result in get_confirmed_faults(cypress_results):
                 await emit(job, "creating_bug_ticket", {"discrepancy": result.get("discrepancy_id")})
                 bug = await create_bug_ticket(
-                    summary=f"[AIspect] {result.get('scenario', result.get('discrepancy_id'))}",
+                    summary=_truncate_summary(
+                        f"[AIspect] {result.get('scenario', result.get('discrepancy_id'))}",
+                        max_length=250,
+                    ),
                     description=(
                         f"{result.get('expected_result', '')} | "
                         f"{result.get('scenario', '')}"
@@ -388,6 +456,7 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
             },
         }
         _persist_result(story_key, job.result)
+        _refresh_eval_results_table(story_key)
         job.status = "completed"
         await emit(job, "done", job.result)
 

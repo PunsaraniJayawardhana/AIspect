@@ -40,6 +40,19 @@ OUTPUT_DIR = PROJECT_ROOT / "output" / "eval"
 CHARTS_DIR = OUTPUT_DIR / "charts"
 DEFAULT_TICKETS = ("EXC-1", "EXC-2", "EXC-4", "EXC-5", "EXC-7", "EXC-9")
 MEAN_APFD_LABEL = "Mean APFD"
+EXCLUDED_TICKET_REASONS = {
+    # EXC-10 targets an auth-gated screen and its confirmed faults are false positives.
+    "EXC-10": "confirmed faults were false positives due to unsupported authenticated screens",
+}
+
+
+def _results_table_headers() -> List[str]:
+    return [
+        "Ticket",
+        "APFD (TPRI)",
+        "APFD (AC-order)",
+        "APFD (Random-30)",
+    ]
 
 
 def _format_float(value: float, digits: int = 4) -> str:
@@ -81,9 +94,17 @@ def _save_csv(path: Path, headers: Sequence[str], rows: Sequence[Sequence[object
         writer.writerows(rows)
 
 
-def _save_markdown(path: Path, headers: Sequence[str], rows: Sequence[Sequence[object]]) -> None:
+def _save_markdown(
+    path: Path,
+    headers: Sequence[str],
+    rows: Sequence[Sequence[object]],
+    note_lines: Sequence[str] | None = None,
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(_render_table(headers, rows) + "\n", encoding="utf-8")
+    markdown = _render_table(headers, rows) + "\n"
+    if note_lines:
+        markdown += "\n" + "\n".join(note_lines) + "\n"
+    path.write_text(markdown, encoding="utf-8")
 
 
 def _load_tests_or_raise(ticket_id: str) -> List[dict]:
@@ -93,41 +114,72 @@ def _load_tests_or_raise(ticket_id: str) -> List[dict]:
 def _collect_eval_rows(ticket_ids: Iterable[str], random_runs: int, seed: int):
     rows = []
     per_ticket_eval = {}
+    exclusions = []
     for ticket_id in ticket_ids:
+        excluded_reason = EXCLUDED_TICKET_REASONS.get(ticket_id)
+        if excluded_reason:
+            exclusions.append({"ticket_id": ticket_id, "reason": excluded_reason})
+            continue
+
         tests = _load_tests_or_raise(ticket_id)
         evaluation = evaluate_orderings(tests, random_runs=random_runs, seed=seed)
+        if int(evaluation.get("n_faults", 0)) <= 0:
+            exclusions.append(
+                {
+                    "ticket_id": ticket_id,
+                    "reason": "zero confirmed faults, APFD undefined",
+                }
+            )
+            continue
+
         orderings = evaluation["orderings"]
+        tpri_apfd = orderings["tpri"]["apfd"]
+        ac_apfd = orderings["ac_declaration"]["apfd"]
+        random_apfd = orderings["random"]["apfd"]
+        if tpri_apfd is None or ac_apfd is None or random_apfd is None:
+            exclusions.append(
+                {
+                    "ticket_id": ticket_id,
+                    "reason": "APFD undefined for one or more orderings",
+                }
+            )
+            continue
+
         row = {
             "ticket_id": ticket_id,
-            "tpri_apfd": float(orderings["tpri"]["apfd"]),
-            "ac_apfd": float(orderings["ac_declaration"]["apfd"]),
-            "random_apfd": float(orderings["random"]["apfd"]),
-            "tpri_ttff": float(orderings["tpri"]["ttff"]),
-            "ac_ttff": float(orderings["ac_declaration"]["ttff"]),
-            "random_ttff": float(orderings["random"]["ttff"]),
+            "tpri_apfd": float(tpri_apfd),
+            "ac_apfd": float(ac_apfd),
+            "random_apfd": float(random_apfd),
         }
         rows.append(row)
         per_ticket_eval[ticket_id] = row
-    return rows, per_ticket_eval
+    return rows, per_ticket_eval, exclusions
+
+
+def _build_exclusion_note_lines(exclusions: Sequence[Dict[str, str]]) -> List[str]:
+    if not exclusions:
+        return []
+    parts = [f"{item['ticket_id']} excluded - {item['reason']}." for item in exclusions]
+    return ["Note: " + " ".join(parts)]
 
 
 def _results_table_rows(eval_rows: Sequence[Dict[str, float]]) -> List[List[object]]:
+    if not eval_rows:
+        raise ValueError("No tickets remain after exclusions; cannot compute APFD averages")
+
     body = [
         [
             row["ticket_id"],
             _format_float(row["tpri_apfd"]),
             _format_float(row["ac_apfd"]),
             _format_float(row["random_apfd"]),
-            _format_float(row["tpri_ttff"]),
-            _format_float(row["ac_ttff"]),
-            _format_float(row["random_ttff"]),
         ]
         for row in eval_rows
     ]
 
     average = {
         key: mean([float(row[key]) for row in eval_rows])
-        for key in ("tpri_apfd", "ac_apfd", "random_apfd", "tpri_ttff", "ac_ttff", "random_ttff")
+        for key in ("tpri_apfd", "ac_apfd", "random_apfd")
     }
     body.append(
         [
@@ -135,12 +187,35 @@ def _results_table_rows(eval_rows: Sequence[Dict[str, float]]) -> List[List[obje
             _format_float(average["tpri_apfd"]),
             _format_float(average["ac_apfd"]),
             _format_float(average["random_apfd"]),
-            _format_float(average["tpri_ttff"]),
-            _format_float(average["ac_ttff"]),
-            _format_float(average["random_ttff"]),
         ]
     )
     return body
+
+
+def refresh_results_table(
+    ticket_ids: Iterable[str],
+    random_runs: int = 30,
+    seed: int = 42,
+    output_dir: Path | None = None,
+) -> List[List[object]]:
+    normalized_ticket_ids = []
+    for ticket in ticket_ids:
+        ticket_id = str(ticket).strip()
+        if ticket_id and ticket_id not in normalized_ticket_ids:
+            normalized_ticket_ids.append(ticket_id)
+
+    if not normalized_ticket_ids:
+        raise ValueError("At least one valid ticket ID must be provided")
+
+    eval_rows, _, exclusions = _collect_eval_rows(normalized_ticket_ids, random_runs=random_runs, seed=seed)
+    table_headers = _results_table_headers()
+    table_rows = _results_table_rows(eval_rows)
+    note_lines = _build_exclusion_note_lines(exclusions)
+
+    target_output_dir = output_dir or OUTPUT_DIR
+    _save_markdown(target_output_dir / "results_table.md", table_headers, table_rows, note_lines=note_lines)
+    _save_csv(target_output_dir / "results_table.csv", table_headers, table_rows)
+    return table_rows
 
 
 def _build_tuning_tickets(ticket_ids: Iterable[str]) -> List[dict]:
@@ -314,22 +389,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
-    print("=== APFD/TTFF RESULTS ===")
-    eval_rows, _ = _collect_eval_rows(ticket_ids, random_runs=args.random_runs, seed=args.seed)
-    table_headers = [
-        "Ticket",
-        "APFD (TPRI)",
-        "APFD (AC-order)",
-        "APFD (Random-30)",
-        "TTFF (TPRI)",
-        "TTFF (AC-order)",
-        "TTFF (Random-30)",
-    ]
-    table_rows = _results_table_rows(eval_rows)
+    print("=== APFD RESULTS ===")
+    eval_rows, _, _ = _collect_eval_rows(ticket_ids, random_runs=args.random_runs, seed=args.seed)
+    table_headers = _results_table_headers()
+    table_rows = refresh_results_table(ticket_ids, random_runs=args.random_runs, seed=args.seed)
     _print_table("", table_headers, table_rows)
-
-    _save_markdown(OUTPUT_DIR / "results_table.md", table_headers, table_rows)
-    _save_csv(OUTPUT_DIR / "results_table.csv", table_headers, table_rows)
 
     print("=== WEIGHT TUNING ===")
     tuning_tickets = _build_tuning_tickets(ticket_ids)
