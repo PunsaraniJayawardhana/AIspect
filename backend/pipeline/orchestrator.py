@@ -2,8 +2,6 @@ import json
 import os
 import pathlib
 import httpx
-import logging
-import inspect
 from backend.jobs.job_store import Job
 from backend.integrations.jira_client import (
     fetch_single_story,
@@ -310,7 +308,7 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
 
         # ── 9. Module 3 — Test generation ───────────────────────────
         await emit(job, "generating_tests")
-        tests = generate_dual_mode_tests(
+        tests = run_test_generator(
             verified,
             explicit_ACs,
             implicit_ACs,

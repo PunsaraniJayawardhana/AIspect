@@ -1,0 +1,1073 @@
+{
+  "story_key": "EXC-15",
+  "screen_type": "form",
+  "uvri_pre": 0.7336578631138977,
+  "uvri_post": 0.7454721914960383,
+  "delta": 0.011814328382140582,
+  "subterms_pre": {
+    "coverage": 0.6666666666666666,
+    "specificity": 0.875,
+    "ambiguity": 0.9954022988505747,
+    "testability": 0.5454545454545454,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "field labels",
+          "input fields matching described data",
+          "submit button",
+          "cancel or back control",
+          "required-field indicators",
+          "placeholder text"
+        ],
+        "referenced_elements": [
+          "field labels",
+          "input fields matching described data",
+          "submit button",
+          "required-field indicators"
+        ],
+        "missing_elements": [
+          "cancel or back control",
+          "placeholder text"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Breadcrumb Navigation: — \"Home\" is a clickable link that navigates to the Home page.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays a phone icon and heading \"Call To Us\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays static text \"We are available 24/7, 7 days a week.\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays support phone number (e.g., \"Phone: +8801611112222\") as a cli",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — A horizontal divider separates this panel from the \"Write To Us\" pan",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Write To Us Panel: — Displays an envelope icon and heading \"Write To US\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Write To Us Panel: — Displays static text \"Fill out our form and we will contact you wit",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, suppor",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Email Field: Required text input, marked with a red asterisk (*); v",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Phone Field: Required text input, marked with a red asterisk (*); v",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans th",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On successful submission: clear",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On validation failure (missing/",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On server/network error: displa",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Footer: — Standard global footer (Subscribe, Support, Account, Quick Link, Download App,",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Other information — Path to access the Contact page: Header navigation > Contact.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Other information — Submitted messages are stored/forwarded to the support team (e.g., v",
+            "checks": {
+              "names_element": false,
+              "observable_state": false,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.25
+          },
+          {
+            "ac": "Other information — Page must be responsive: the \"Call To Us\"/\"Write To Us\" panel and th",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Other information — No authentication state affects this page; it is identical for guest",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Other information — Note: Source design contains minor typos (\"Massage\" instead of \"Mess",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 435,
+        "ambiguous_count": 2,
+        "matched_terms": [
+          {
+            "term": "responsive",
+            "category": "ui_domain_extension"
+          },
+          {
+            "term": "should",
+            "category": "weak_modals"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+            "testable": true
+          },
+          {
+            "ac": "Breadcrumb Navigation: — \"Home\" is a clickable link that navigates to the Home page.",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays a phone icon and heading \"Call To Us\".",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays static text \"We are available 24/7, 7 days a week.\".",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays support phone number (e.g., \"Phone: +8801611112222\") as a clickable tel",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — A horizontal divider separates this panel from the \"Write To Us\" panel below",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays an envelope icon and heading \"Write To US\".",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays static text \"Fill out our form and we will contact you within 24 ho",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, support@exclusiv",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Your Email Field: Required text input, marked with a red asterisk (*); validates p",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Your Phone Field: Required text input, marked with a red asterisk (*); validates n",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans the full wid",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On successful submission: clears the form",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On validation failure (missing/invalid re",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On server/network error: displays an erro",
+            "testable": false
+          },
+          {
+            "ac": "Footer: — Standard global footer (Subscribe, Support, Account, Quick Link, Download App, Copyright",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Path to access the Contact page: Header navigation > Contact.",
+            "testable": true
+          },
+          {
+            "ac": "Other information — Submitted messages are stored/forwarded to the support team (e.g., via email n",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Page must be responsive: the \"Call To Us\"/\"Write To Us\" panel and the form sta",
+            "testable": false
+          },
+          {
+            "ac": "Other information — No authentication state affects this page; it is identical for guest and logged",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Note: Source design contains minor typos (\"Massage\" instead of \"Message\", \"Cant",
+            "testable": false
+          }
+        ]
+      }
+    }
+  },
+  "subterms_post": {
+    "coverage": 0.6666666666666666,
+    "specificity": 0.875,
+    "ambiguity": 0.9967051070840197,
+    "testability": 0.5714285714285714,
+    "details": {
+      "coverage": {
+        "expected_elements": [
+          "field labels",
+          "input fields matching described data",
+          "submit button",
+          "cancel or back control",
+          "required-field indicators",
+          "placeholder text"
+        ],
+        "referenced_elements": [
+          "input fields matching described data",
+          "submit button",
+          "required-field indicators",
+          "placeholder text"
+        ],
+        "missing_elements": [
+          "field labels",
+          "cancel or back control"
+        ]
+      },
+      "specificity": {
+        "per_ac": [
+          {
+            "ac": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Breadcrumb Navigation: — \"Home\" is a clickable link that navigates to the Home page.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays a phone icon and heading \"Call To Us\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays static text \"We are available 24/7, 7 days a week.\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — Displays support phone number (e.g., \"Phone: +8801611112222\") as a cl",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Call To Us Panel: — A horizontal divider separates this panel from the \"Write To Us\" pan",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Write To Us Panel: — Displays an envelope icon and heading \"Write To US\".",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Write To Us Panel: — Displays static text \"Fill out our form and we will contact you wit",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, suppor",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Email Field: Required text input, marked with a red asterisk (*); v",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Phone Field: Required text input, marked with a red asterisk (*); v",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans th",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On successful submission: clear",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On validation failure (missing/",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On server/network error: displa",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Footer: — Standard global footer (Subscribe, Support, Account, Quick Link, Download App,",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Other information — Path to access the Contact page: Header navigation > Contact.",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Other information — Submitted messages are stored/forwarded to the support team (e.g., v",
+            "checks": {
+              "names_element": false,
+              "observable_state": false,
+              "concrete_value": true,
+              "measurable_outcome": false
+            },
+            "score": 0.25
+          },
+          {
+            "ac": "Other information — Page must be responsive: the \"Call To Us\"/\"Write To Us\" panel and th",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Other information — No authentication state affects this page; it is identical for guest",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "Other information — Note: Source design contains minor typos (\"Massage\" instead of \"Mess",
+            "checks": {
+              "names_element": false,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          },
+          {
+            "ac": "The Contact page displays a prominent section heading (e.g., 'Contact Us') above or adj",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The contact form area displays a visible heading or label (e.g., 'Send a Message' or 'G",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "Each of the Your Name, Your Email, Your Phone, and Your Message fields displays descript",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The Your Name, Your Email, and Your Phone fields are displayed side-by-side in a single",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": true,
+              "measurable_outcome": true
+            },
+            "score": 1.0
+          },
+          {
+            "ac": "The Send Message button is visually distinct (e.g., filled background in the brand colo",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": false
+            },
+            "score": 0.5
+          },
+          {
+            "ac": "The Contact page displays the standard global site header (including the platform logo a",
+            "checks": {
+              "names_element": true,
+              "observable_state": true,
+              "concrete_value": false,
+              "measurable_outcome": true
+            },
+            "score": 0.75
+          }
+        ]
+      },
+      "ambiguity": {
+        "total_words": 607,
+        "ambiguous_count": 2,
+        "matched_terms": [
+          {
+            "term": "responsive",
+            "category": "ui_domain_extension"
+          },
+          {
+            "term": "should",
+            "category": "weak_modals"
+          }
+        ]
+      },
+      "testability": {
+        "per_ac": [
+          {
+            "ac": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+            "testable": true
+          },
+          {
+            "ac": "Breadcrumb Navigation: — \"Home\" is a clickable link that navigates to the Home page.",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays a phone icon and heading \"Call To Us\".",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays static text \"We are available 24/7, 7 days a week.\".",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — Displays support phone number (e.g., \"Phone: +8801611112222\") as a clickable tel",
+            "testable": true
+          },
+          {
+            "ac": "Call To Us Panel: — A horizontal divider separates this panel from the \"Write To Us\" panel belo",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays an envelope icon and heading \"Write To US\".",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays static text \"Fill out our form and we will contact you within 24 h",
+            "testable": true
+          },
+          {
+            "ac": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, support@exclusi",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Your Email Field: Required text input, marked with a red asterisk (*); validates p",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Your Phone Field: Required text input, marked with a red asterisk (*); validates n",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans the full wid",
+            "testable": true
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On successful submission: clears the form",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On validation failure (missing/invalid re",
+            "testable": false
+          },
+          {
+            "ac": "Contact Form: — Send Message Button: Submits the form. — On server/network error: displays an erro",
+            "testable": false
+          },
+          {
+            "ac": "Footer: — Standard global footer (Subscribe, Support, Account, Quick Link, Download App, Copyright",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Path to access the Contact page: Header navigation > Contact.",
+            "testable": true
+          },
+          {
+            "ac": "Other information — Submitted messages are stored/forwarded to the support team (e.g., via email n",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Page must be responsive: the \"Call To Us\"/\"Write To Us\" panel and the form sta",
+            "testable": false
+          },
+          {
+            "ac": "Other information — No authentication state affects this page; it is identical for guest and logged",
+            "testable": false
+          },
+          {
+            "ac": "Other information — Note: Source design contains minor typos (\"Massage\" instead of \"Message\", \"Can",
+            "testable": false
+          },
+          {
+            "ac": "The Contact page displays a prominent section heading (e.g., 'Contact Us') above or adjacent to th",
+            "testable": true
+          },
+          {
+            "ac": "The contact form area displays a visible heading or label (e.g., 'Send a Message' or 'Get In Touch",
+            "testable": true
+          },
+          {
+            "ac": "Each of the Your Name, Your Email, Your Phone, and Your Message fields displays descriptive placeho",
+            "testable": true
+          },
+          {
+            "ac": "The Your Name, Your Email, and Your Phone fields are displayed side-by-side in a single row of thre",
+            "testable": false
+          },
+          {
+            "ac": "The Send Message button is visually distinct (e.g., filled background in the brand colour with cont",
+            "testable": false
+          },
+          {
+            "ac": "The Contact page displays the standard global site header (including the platform logo and main nav",
+            "testable": true
+          }
+        ]
+      }
+    }
+  },
+  "explicit_ACs": [
+    "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+    "Breadcrumb Navigation: — \"Home\" is a clickable link that navigates to the Home page.",
+    "Call To Us Panel: — Displays a phone icon and heading \"Call To Us\".",
+    "Call To Us Panel: — Displays static text \"We are available 24/7, 7 days a week.\".",
+    "Call To Us Panel: — Displays support phone number (e.g., \"Phone: +8801611112222\") as a clickable tel: link.",
+    "Call To Us Panel: — A horizontal divider separates this panel from the \"Write To Us\" panel below it.",
+    "Write To Us Panel: — Displays an envelope icon and heading \"Write To US\".",
+    "Write To Us Panel: — Displays static text \"Fill out our form and we will contact you within 24 hours.\".",
+    "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, support@exclusive.com) as clickable mailto: links.",
+    "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+    "Contact Form: — Your Email Field: Required text input, marked with a red asterisk (*); validates proper email format on submit.",
+    "Contact Form: — Your Phone Field: Required text input, marked with a red asterisk (*); validates numeric/phone format on submit.",
+    "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans the full width below the three top fields.",
+    "Contact Form: — Send Message Button: Submits the form. — On successful submission: clears the form fields and displays a success confirmation (e.g., toast \"Your message has been sent\").",
+    "Contact Form: — Send Message Button: Submits the form. — On validation failure (missing/invalid required field): displays inline error messages under the respective field(s) and does not submit.",
+    "Contact Form: — Send Message Button: Submits the form. — On server/network error: displays an error message (e.g., \"Something went wrong, please try again\") and retains entered field values.",
+    "Footer: — Standard global footer (Subscribe, Support, Account, Quick Link, Download App, Copyright bar) is rendered as on all other pages.",
+    "Other information — Path to access the Contact page: Header navigation > Contact.",
+    "Other information — Submitted messages are stored/forwarded to the support team (e.g., via email notification or backend ticketing system) for follow-up within the stated 24-hour window.",
+    "Other information — Page must be responsive: the \"Call To Us\"/\"Write To Us\" panel and the form stack vertically on smaller screen widths.",
+    "Other information — No authentication state affects this page; it is identical for guest and logged-in users.",
+    "Other information — Note: Source design contains minor typos (\"Massage\" instead of \"Message\", \"Cantact\" instead of \"Contact\"); actual implementation should use corrected spelling (\"Message\", \"Contact\") unless intentionally replicating design text."
+  ],
+  "implicit_ACs": [
+    "The Contact page displays a prominent section heading (e.g., 'Contact Us') above or adjacent to the contact information panels and form.",
+    "The contact form area displays a visible heading or label (e.g., 'Send a Message' or 'Get In Touch') identifying it as the message submission section.",
+    "Each of the Your Name, Your Email, Your Phone, and Your Message fields displays descriptive placeholder text (e.g., 'Your Name *', 'Your Email *', 'Your Phone *', 'Your Message') inside the input when empty.",
+    "The Your Name, Your Email, and Your Phone fields are displayed side-by-side in a single row of three equal-width columns above the full-width Your Message textarea.",
+    "The Send Message button is visually distinct (e.g., filled background in the brand colour with contrasting label text) and is positioned below the Your Message textarea, aligned to the right or bottom of the form.",
+    "The Contact page displays the standard global site header (including the platform logo and main navigation links) at the top of the page, consistent with all other pages on the platform."
+  ],
+  "all_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Breadcrumb Navigation",
+      "discrepancy_type": "Wrong Label",
+      "description": "The breadcrumb displays 'Cantact' instead of the correctly spelled 'Contact'.",
+      "location": "top of page content area",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+      "feedback": "The label or text on 'Breadcrumb Navigation' at top of page content area does not match what is specified in AC-01. This mismatch was detected in 3 out of 5 validation passes and is classified as MEDIUM confidence."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Your Name Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The 'Your Name' required input field is entirely absent from the contact form; only 'Your Email' and 'Your Phone' fields are visible in the top row.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+      "feedback": "The 'Your Name Field' is missing from the design at form body. This element is required by AC-02 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Contact Form top row layout",
+      "discrepancy_type": "Layout Constraint Mismatch",
+      "description": "The form shows only two fields (Your Email and Your Phone) in the top row instead of three equal-width columns including Your Name.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "The Your Name, Your Email, and Your Phone fields are displayed side-by-side in a single row of three equal-width columns above the full-width Your Message textarea.",
+      "feedback": "The positioning or layout of 'Contact Form top row layout' at form body does not satisfy the layout constraints in AC-03. Detected in 3 out of 5 passes."
+    },
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Contact Form heading/label",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible heading or label above or within the contact form area identifying it as the message submission section.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The contact form area displays a visible heading or label (e.g., 'Send a Message' or 'Get In Touch') identifying it as the message submission section.",
+      "feedback": "The 'Contact Form heading/label' is missing from the design at form body. This element is required by AC-04 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Write To Us email addresses",
+      "discrepancy_type": "Wrong Label",
+      "description": "The displayed email addresses are 'customer@exclusive.com' and 'support@exclusive.com' but the design shows 'customer@exclusive.com' and 'support@exclusive.com' — however the label prefix reads 'Emails:' (plural) for both entries which is acceptable, yet the domain shown matches; no discrepancy on domain but cannot confirm they are clickable mailto: links from the static design.",
+      "location": "left panel",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, support@exclusive.com) as clickable mailto: links.",
+      "feedback": "The label or text on 'Write To Us email addresses' at left panel does not match what is specified in AC-06. This mismatch was detected in 3 out of 5 validation passes and is classified as MEDIUM confidence."
+    },
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Page section heading",
+      "discrepancy_type": "Missing Element",
+      "description": "No prominent 'Contact Us' or equivalent section heading is displayed above or adjacent to the contact panels and form.",
+      "location": "main content area",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The Contact page displays a prominent section heading (e.g., 'Contact Us') above or adjacent to the contact information panels and form.",
+      "feedback": "The 'Page section heading' is missing from the design at main content area. This element is required by AC-05 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Your Message textarea asterisk",
+      "discrepancy_type": "Business Rule Violation",
+      "description": "The Your Message textarea does not span the full width below three top-row fields because the 'Your Name' field is missing, leaving only two fields in the top row, breaking the intended layout relationship.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans the full width below the three top fields.",
+      "feedback": "The design of 'Your Message textarea asterisk' at form body violates a business rule defined in AC-07. This was flagged in 1 out of 5 validation passes, indicating a significant requirement deviation."
+    },
+    {
+      "requirement_id": "AC-08",
+      "element_name": "Your Message textarea placeholder",
+      "discrepancy_type": "Wrong Label",
+      "description": "The message textarea displays 'Your Massage' (misspelled) instead of the correct placeholder text 'Your Message'.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Each of the Your Name, Your Email, Your Phone, and Your Message fields displays descriptive placeholder text (e.g., 'Your Name *', 'Your Email *', 'Your Phone *', 'Your Message') inside the input when empty.",
+      "feedback": "The label or text on 'Your Message textarea placeholder' at form body does not match what is specified in AC-08. This mismatch was detected in 1 out of 5 validation passes and is classified as LOW confidence."
+    }
+  ],
+  "high_confidence_discrepancies": [],
+  "medium_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-01",
+      "element_name": "Breadcrumb Navigation",
+      "discrepancy_type": "Wrong Label",
+      "description": "The breadcrumb displays 'Cantact' instead of the correctly spelled 'Contact'.",
+      "location": "top of page content area",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Breadcrumb Navigation: — Displays \"Home / Contact\" at the top of the page.",
+      "feedback": "The label or text on 'Breadcrumb Navigation' at top of page content area does not match what is specified in AC-01. This mismatch was detected in 3 out of 5 validation passes and is classified as MEDIUM confidence."
+    },
+    {
+      "requirement_id": "AC-02",
+      "element_name": "Your Name Field",
+      "discrepancy_type": "Missing Element",
+      "description": "The 'Your Name' required input field is entirely absent from the contact form; only 'Your Email' and 'Your Phone' fields are visible in the top row.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Contact Form: — Your Name Field: Required text input, marked with a red asterisk (*).",
+      "feedback": "The 'Your Name Field' is missing from the design at form body. This element is required by AC-02 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-03",
+      "element_name": "Contact Form top row layout",
+      "discrepancy_type": "Layout Constraint Mismatch",
+      "description": "The form shows only two fields (Your Email and Your Phone) in the top row instead of three equal-width columns including Your Name.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "The Your Name, Your Email, and Your Phone fields are displayed side-by-side in a single row of three equal-width columns above the full-width Your Message textarea.",
+      "feedback": "The positioning or layout of 'Contact Form top row layout' at form body does not satisfy the layout constraints in AC-03. Detected in 3 out of 5 passes."
+    },
+    {
+      "requirement_id": "AC-04",
+      "element_name": "Contact Form heading/label",
+      "discrepancy_type": "Missing Element",
+      "description": "There is no visible heading or label above or within the contact form area identifying it as the message submission section.",
+      "location": "form body",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The contact form area displays a visible heading or label (e.g., 'Send a Message' or 'Get In Touch') identifying it as the message submission section.",
+      "feedback": "The 'Contact Form heading/label' is missing from the design at form body. This element is required by AC-04 and was not found in 3 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-06",
+      "element_name": "Write To Us email addresses",
+      "discrepancy_type": "Wrong Label",
+      "description": "The displayed email addresses are 'customer@exclusive.com' and 'support@exclusive.com' but the design shows 'customer@exclusive.com' and 'support@exclusive.com' — however the label prefix reads 'Emails:' (plural) for both entries which is acceptable, yet the domain shown matches; no discrepancy on domain but cannot confirm they are clickable mailto: links from the static design.",
+      "location": "left panel",
+      "confidence_index": 0.6,
+      "confidence_label": "MEDIUM",
+      "identified_in_runs": 3,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Write To Us Panel: — Displays two support email addresses (customer@exclusive.com, support@exclusive.com) as clickable mailto: links.",
+      "feedback": "The label or text on 'Write To Us email addresses' at left panel does not match what is specified in AC-06. This mismatch was detected in 3 out of 5 validation passes and is classified as MEDIUM confidence."
+    }
+  ],
+  "low_confidence_discrepancies": [
+    {
+      "requirement_id": "AC-05",
+      "element_name": "Page section heading",
+      "discrepancy_type": "Missing Element",
+      "description": "No prominent 'Contact Us' or equivalent section heading is displayed above or adjacent to the contact panels and form.",
+      "location": "main content area",
+      "confidence_index": 0.4,
+      "confidence_label": "LOW",
+      "identified_in_runs": 2,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The Contact page displays a prominent section heading (e.g., 'Contact Us') above or adjacent to the contact information panels and form.",
+      "feedback": "The 'Page section heading' is missing from the design at main content area. This element is required by AC-05 and was not found in 2 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-07",
+      "element_name": "Your Message textarea asterisk",
+      "discrepancy_type": "Business Rule Violation",
+      "description": "The Your Message textarea does not span the full width below three top-row fields because the 'Your Name' field is missing, leaving only two fields in the top row, breaking the intended layout relationship.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "Contact Form: — Your Message Field: Optional multi-line textarea (no asterisk), spans the full width below the three top fields.",
+      "feedback": "The design of 'Your Message textarea asterisk' at form body violates a business rule defined in AC-07. This was flagged in 1 out of 5 validation passes, indicating a significant requirement deviation."
+    },
+    {
+      "requirement_id": "AC-08",
+      "element_name": "Your Message textarea placeholder",
+      "discrepancy_type": "Wrong Label",
+      "description": "The message textarea displays 'Your Massage' (misspelled) instead of the correct placeholder text 'Your Message'.",
+      "location": "form body",
+      "confidence_index": 0.2,
+      "confidence_label": "LOW",
+      "identified_in_runs": 1,
+      "n_passes": 5,
+      "severity": "MEDIUM",
+      "violated_criterion": "Each of the Your Name, Your Email, Your Phone, and Your Message fields displays descriptive placeholder text (e.g., 'Your Name *', 'Your Email *', 'Your Phone *', 'Your Message') inside the input when empty.",
+      "feedback": "The label or text on 'Your Message textarea placeholder' at form body does not match what is specified in AC-08. This mismatch was detected in 1 out of 5 validation passes and is classified as LOW confidence."
+    }
+  ],
+  "tests": [],
+  "cypress_results": [],
+  "bugs_created": []
+}
