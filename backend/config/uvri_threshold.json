@@ -1,0 +1,39 @@
+{
+  "threshold": 0.721,
+  "rule": "flag_not_ready_if_uvri_leq_threshold",
+  "phase": "pre",
+  "ground_truth_cutoff": 3.0,
+  "auc": 0.9444,
+  "tp": 6,
+  "fp": 3,
+  "fn": 0,
+  "tn": 12,
+  "sensitivity": 1.0,
+  "specificity": 0.8,
+  "precision": 0.6667,
+  "f1": 0.8,
+  "youden_j": 0.8,
+  "n_not_ready": 6,
+  "n_acceptable": 15,
+  "bootstrap": {
+    "n_effective": 2000,
+    "threshold_ci95": [
+      0.2034,
+      0.721
+    ],
+    "threshold_median": 0.721,
+    "auc_ci95": [
+      0.8163,
+      1.0
+    ],
+    "auc_median": 0.9556
+  },
+  "weights": {
+    "cov": 0.0697,
+    "spec": 0.3154,
+    "amb": 0.1685,
+    "test": 0.4464
+  },
+  "calibrated_on": "Book3.xlsx",
+  "calibrated_at": "2026-08-09T08:01:56+00:00"
+}
