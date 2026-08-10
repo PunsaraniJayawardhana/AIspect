@@ -15,7 +15,7 @@ from backend.pipeline.module1.uvri import compute_uvri
 from backend.pipeline.module1.inference import infer_implicit_elements
 from backend.pipeline.module2.multipass_validator import run_multipass_validation
 from backend.pipeline.module2.confidence_index import compute_confidence_index
-from backend.pipeline.module3.test_generator import run_test_generator as generate_dual_mode_tests
+from backend.pipeline.module3.test_generator import run_test_generator
 from backend.pipeline.module3.cypress_runner import execute_cypress, get_confirmed_faults
 from backend.pipeline.module3.docx_exporter import export_to_docx, export_to_markdown
 from backend.pipeline.module3.evaluate_tpri import load_ticket_results
@@ -250,6 +250,20 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
             "dynamic_count": len(dynamic_ACs),
         })
 
+        # Populate intermediate result for Module 1 to let frontend render it immediately
+        job.result = {
+            "story_key": story_key,
+            "screen_type": screen_type,
+            "explicit_ACs": explicit_ACs,
+            "implicit_ACs": implicit_ACs,
+            "enriched_ACs": enriched_ACs,
+            "uvri_pre": uvri_pre,
+            "uvri_post": uvri_post,
+            "static_count": len(static_ACs),
+            "dynamic_count": len(dynamic_ACs),
+        }
+
+
         # ── 8. Module 2 — Multi-pass validation ─────────────────────
         # Only static ACs are sent to Module 2
         # Dynamic ACs bypass Module 2 and go directly to Module 3
@@ -305,6 +319,15 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
               f"output/module2_output/{story_key}.json")
 
         await emit(job, "module2_done", {"verified_discrepancies": verified})
+
+        # Update intermediate result for Module 2 to let frontend render it immediately
+        if job.result:
+            job.result.update({
+                "high_confidence_discrepancies": high_confidence,
+                "medium_confidence_discrepancies": medium_confidence,
+                "all_discrepancies": verified,
+            })
+
 
         # ── 9. Module 3 — Test generation ───────────────────────────
         await emit(job, "generating_tests")
