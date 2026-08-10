@@ -217,6 +217,27 @@ async def process_one_story(job: Job, story_key: str, app_url: str = None, nav_p
         uvri_pre, sub_pre = await compute_uvri(parsed["explicit_ACs"], screen_type)
         await emit(job, "uvri_pre_done", {"uvri": uvri_pre, "subterms": sub_pre})
 
+        from backend.metrics.uvri_gate import active_threshold
+        threshold = active_threshold()
+        if uvri_pre < threshold:
+            print(f"[Orchestrator] Rejected: UVRI pre score {uvri_pre:.3f} is less than threshold {threshold:.3f}")
+            reject_record = {
+                "story_key":      story_key,
+                "story_summary":  story.get("summary", ""),
+                "status_at_skip": story.get("status"),
+                "skipped":        True,
+                "rejected":       True,
+                "reason":         f"UVRI pre-enrichment score ({uvri_pre:.3f}) is less than the active threshold ({threshold:.3f})",
+                "uvri_pre":       uvri_pre,
+                "threshold":      threshold,
+            }
+            _persist_result(story_key, reject_record)
+            job.status = "completed"
+            job.result = reject_record
+            await emit(job, "rejected", reject_record)
+            await emit(job, "done", job.result)
+            return
+
         # ── 6. Module 1 — Implicit inference ─────────────────────
         await emit(job, "running_implicit_inference")
         implicit_ACs = await infer_implicit_elements(parsed, screen_type)
