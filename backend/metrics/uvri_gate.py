@@ -28,7 +28,12 @@ _CONFIG_PATH = Path(__file__).resolve().parents[1] / "config" / "uvri_threshold.
 def _load_threshold() -> float:
     try:
         data = json.loads(_CONFIG_PATH.read_text())
-        return float(data["threshold"])
+        threshold = float(data["threshold"])
+        if not (0.0 <= threshold <= 1.0):
+            raise ValueError(f"threshold out of range: {threshold}")
+        if threshold == 0.0:
+            raise ValueError("threshold must be greater than zero")
+        return threshold
     except (OSError, ValueError, KeyError):
         return DEFAULT_THRESHOLD
 

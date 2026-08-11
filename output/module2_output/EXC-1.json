@@ -17,24 +17,10 @@
       "feedback": "The 'Confirm Password field' is missing from the design at form body. This element is required by AC-04 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     },
     {
-      "requirement_id": "AC-09",
-      "element_name": "Exclusive platform logo above registration form",
-      "discrepancy_type": "Missing Element",
-      "description": "There is no Exclusive logo visible above the registration form in the right panel; the logo only appears in the top navigation bar, not prominently above the form itself.",
-      "location": "form body / right panel",
-      "confidence_index": 1.0,
-      "confidence_label": "HIGH",
-      "identified_in_runs": 5,
-      "n_passes": 5,
-      "severity": "HIGH",
-      "violated_criterion": "The sign up screen displays the Exclusive platform logo prominently, above the registration form.",
-      "feedback": "The 'Exclusive platform logo above registration form' is missing from the design at form body / right panel. This element is required by AC-09 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
-    },
-    {
       "requirement_id": "AC-12",
-      "element_name": "Password field show/hide toggle icon",
+      "element_name": "Password show/hide toggle icon",
       "discrepancy_type": "Missing Element",
-      "description": "The Password field does not display any visible show/hide toggle icon on its right side.",
+      "description": "The Password field has no visible show/hide toggle icon on its right side.",
       "location": "form body",
       "confidence_index": 1.0,
       "confidence_label": "HIGH",
@@ -42,21 +28,35 @@
       "n_passes": 5,
       "severity": "HIGH",
       "violated_criterion": "The Password field includes a show/hide toggle icon that allows the user to reveal or conceal the masked input.",
-      "feedback": "The 'Password field show/hide toggle icon' is missing from the design at form body. This element is required by AC-12 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+      "feedback": "The 'Password show/hide toggle icon' is missing from the design at form body. This element is required by AC-12 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     },
     {
       "requirement_id": "AC-15",
-      "element_name": "Visual divider or separator between Create Account and Sign up with Google buttons",
+      "element_name": "Visual separator between Create Account and Sign up with Google buttons",
       "discrepancy_type": "Missing Element",
-      "description": "There is no horizontal line, 'Or' label, or any other visual divider visible between the Create Account button and the Sign up with Google button.",
+      "description": "There is no horizontal rule or 'or' label visible between the Create Account button and the Sign up with Google button.",
       "location": "form body",
       "confidence_index": 1.0,
       "confidence_label": "HIGH",
       "identified_in_runs": 5,
       "n_passes": 5,
       "severity": "HIGH",
-      "violated_criterion": "A visual divider or separator (e.g. a horizontal line with the label 'Or') is displayed between the Create Account button and the Sign up with Google button.",
-      "feedback": "The 'Visual divider or separator between Create Account and Sign up with Google buttons' is missing from the design at form body. This element is required by AC-15 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+      "violated_criterion": "A visual separator — such as a horizontal rule with the label 'or' — is displayed between the Create Account button and the Sign up with Google button.",
+      "feedback": "The 'Visual separator between Create Account and Sign up with Google buttons' is missing from the design at form body. This element is required by AC-15 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-09",
+      "element_name": "Exclusive platform logo above registration form",
+      "discrepancy_type": "Missing Element",
+      "description": "No logo is displayed above the registration form on the right-hand panel; the logo only appears in the top navigation bar, not prominently above the form itself.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo prominently, above the registration form.",
+      "feedback": "The 'Exclusive platform logo above registration form' is missing from the design at form body. This element is required by AC-09 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     }
   ],
   "medium_confidence": [],
@@ -76,24 +76,10 @@
       "feedback": "The 'Confirm Password field' is missing from the design at form body. This element is required by AC-04 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     },
     {
-      "requirement_id": "AC-09",
-      "element_name": "Exclusive platform logo above registration form",
-      "discrepancy_type": "Missing Element",
-      "description": "There is no Exclusive logo visible above the registration form in the right panel; the logo only appears in the top navigation bar, not prominently above the form itself.",
-      "location": "form body / right panel",
-      "confidence_index": 1.0,
-      "confidence_label": "HIGH",
-      "identified_in_runs": 5,
-      "n_passes": 5,
-      "severity": "HIGH",
-      "violated_criterion": "The sign up screen displays the Exclusive platform logo prominently, above the registration form.",
-      "feedback": "The 'Exclusive platform logo above registration form' is missing from the design at form body / right panel. This element is required by AC-09 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
-    },
-    {
       "requirement_id": "AC-12",
-      "element_name": "Password field show/hide toggle icon",
+      "element_name": "Password show/hide toggle icon",
       "discrepancy_type": "Missing Element",
-      "description": "The Password field does not display any visible show/hide toggle icon on its right side.",
+      "description": "The Password field has no visible show/hide toggle icon on its right side.",
       "location": "form body",
       "confidence_index": 1.0,
       "confidence_label": "HIGH",
@@ -101,21 +87,35 @@
       "n_passes": 5,
       "severity": "HIGH",
       "violated_criterion": "The Password field includes a show/hide toggle icon that allows the user to reveal or conceal the masked input.",
-      "feedback": "The 'Password field show/hide toggle icon' is missing from the design at form body. This element is required by AC-12 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+      "feedback": "The 'Password show/hide toggle icon' is missing from the design at form body. This element is required by AC-12 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     },
     {
       "requirement_id": "AC-15",
-      "element_name": "Visual divider or separator between Create Account and Sign up with Google buttons",
+      "element_name": "Visual separator between Create Account and Sign up with Google buttons",
       "discrepancy_type": "Missing Element",
-      "description": "There is no horizontal line, 'Or' label, or any other visual divider visible between the Create Account button and the Sign up with Google button.",
+      "description": "There is no horizontal rule or 'or' label visible between the Create Account button and the Sign up with Google button.",
       "location": "form body",
       "confidence_index": 1.0,
       "confidence_label": "HIGH",
       "identified_in_runs": 5,
       "n_passes": 5,
       "severity": "HIGH",
-      "violated_criterion": "A visual divider or separator (e.g. a horizontal line with the label 'Or') is displayed between the Create Account button and the Sign up with Google button.",
-      "feedback": "The 'Visual divider or separator between Create Account and Sign up with Google buttons' is missing from the design at form body. This element is required by AC-15 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+      "violated_criterion": "A visual separator — such as a horizontal rule with the label 'or' — is displayed between the Create Account button and the Sign up with Google button.",
+      "feedback": "The 'Visual separator between Create Account and Sign up with Google buttons' is missing from the design at form body. This element is required by AC-15 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
+    },
+    {
+      "requirement_id": "AC-09",
+      "element_name": "Exclusive platform logo above registration form",
+      "discrepancy_type": "Missing Element",
+      "description": "No logo is displayed above the registration form on the right-hand panel; the logo only appears in the top navigation bar, not prominently above the form itself.",
+      "location": "form body",
+      "confidence_index": 1.0,
+      "confidence_label": "HIGH",
+      "identified_in_runs": 5,
+      "n_passes": 5,
+      "severity": "HIGH",
+      "violated_criterion": "The sign up screen displays the Exclusive platform logo prominently, above the registration form.",
+      "feedback": "The 'Exclusive platform logo above registration form' is missing from the design at form body. This element is required by AC-09 and was not found in 5 out of 5 validation passes. QA engineers would expect this element to be present on this screen."
     }
   ],
   "dynamic_ACs": [

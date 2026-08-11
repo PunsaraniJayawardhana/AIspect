@@ -11,6 +11,15 @@ from backend.integrations.jira_client import fetch_story_keys
 router = APIRouter(prefix="/api/stories", tags=["stories"])
 
 
+@router.get("/threshold")
+async def get_threshold():
+    """
+    Return the active UVRI threshold.
+    """
+    from backend.metrics.uvri_gate import active_threshold
+    return {"threshold": active_threshold()}
+
+
 @router.get("")
 async def list_stories(project_key: Optional[str] = Query(default=None)):
     """
